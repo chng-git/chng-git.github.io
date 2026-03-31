@@ -1,8 +1,8 @@
-# 🐾 2026년 1학기 블록체인 실습
+# 2026-1 블록체인 실습
 20221530 박채원
-이 레포지토리는 블록체인 수업의 매주 차 실습 과제와 코드를 기록합니다.
+이 레포지토리는 블록체인 실습 수업의 매주 차 실습 과제와 코드를 기록합니다.
 
---
+---
 ## Assignment
 | 주차 | 과제명 | 코드 확인 (Code) | 실제 실행 (Web View) |
 |:---:|:---|:---:|:---|
@@ -11,7 +11,7 @@
 | **Week 2** | Ethereum RPC Practice | [폴더 보기](./week2_ethereum-rpc-practice) | (웹 UI 없음) |
 | **Week 1** | 블록체인 기초 과제 | [코드 보기](./week1_bitcoin-ethereum-prices/week1_assignmnet04.html) | [🚀 웹에서 실행하기](https://chng-git.github.io/week1_bitcoin-ethereum-prices/week1_assignmnet04.html) |
 
---
+---
 
 ## Week 1 Assignment
 - GitHub 계정 생성 및 홈페이지 구축
@@ -19,7 +19,7 @@
   정상적인 업데이트 확인을 위한 오류 안내 문구를 넣었습니다.
   API 호출 제한으로 인하여 실시간 업데이트 주기를 2분으로 최적화하였습니다.
 
---
+---
 
 ## Week 2 Assignment
 
@@ -29,36 +29,28 @@
 - (ethers) : ethers.js 라이브러리를 이용하여 최신 블록 정보를 불러왔습니다.
 - (.gitignore) : API가 직접적으로 노출되지 않게 합니다.
 
-
-
 ### 의존성 패키지 설치
 'ethers'와 'dotenv' 라이브러리를 사용하기 위해 터미널에 아래 명령어를 입력합니다.
 ```bash
 npm install
 ```
 
-
-
 ### (.env) 파일 설정
 보안을 위하여 API 키는 직접적으로 노출하지 않습니다.
 
 (.env.example)파일 형식을 참고하여 Infura API 키를 입력할 수 있습니다.
-
-
 
 ### 실행 방법
   Assignment #3 (json-rpc) 실행
 ```bash
 node json-rpc/index.js
 ```
-
-
   Assignment #4 (ethers.js) 실행
 ```bash
 node ethers/index.js
 ```
 
---
+---
 
 ## Week 3 Assignment
 
@@ -84,7 +76,7 @@ node ethers/index.js
 | **3️⃣** | `03-track-tx.js` | **온체인 데이터 추적** | 발생한 트랜잭션 해시(TX Hash)를 기반으로 블록체인 원장에 기록된 세부 데이터(Nonce, 서명값 r, s, v 등)를 역추적하여 출력합니다. |
 | **4️⃣** | `04-verify-sig.js` | **서명 무결성 검증** | 타원곡선 암호(`ecrecover`) 원리를 활용해 서명 데이터(r, s, v)에서 송신자의 공개키(주소)를 수학적으로 복원하고, 실제 송신자(`tx.from`)와 일치하는지 증명합니다. |
 | **5️⃣** | `05-bridge-tx.js` | **크로스체인 분석** | L1(Sepolia) ↔ L2(Base/GIWA) 간 브릿지(Bridge) 트랜잭션을 분석하여 스마트 컨트랙트 호출 여부, 가스비(Gas Used), 그리고 최종 실행 상태(Status)를 판별합니다. |
---
+---
 ## Week 5 Assignment
 
 - 이 프로젝트는 웹 브라우저 상에서 직접 Solidity 코드를 컴파일하고 배포하는 과정을 체험할 수 있도록 만든 **프론트엔드 시뮬레이터**입니다. Remix IDE의 핵심 경험을 모방하여 제작되었습니다.
