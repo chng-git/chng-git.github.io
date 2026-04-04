@@ -8,6 +8,7 @@
   - **Lab 3**에서는 실제 가치(ETH)가 오가는 Faucet(수도꼭지) 컨트랙트를 통해 접근 제어(Access Control)와 시간 조작을 시뮬레이션하며 블록체인의 심화 개념을 마스터할 수 습니다.
 
 <br>
+----
 
 ## 실습 상세 내용 (Lab 1: Hello World & Variables)
 
