@@ -6,76 +6,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026-1 블록체인 실습 대시보드 🐾</title>
     <style>
+        /* --- 귀여운 치즈 고양이 테마 설정 --- */
+        :root {
+            --cat-orange: #fdba74;
+            /* 따뜻한 치즈색 */
+            --cat-brown: #8b5a2b;
+            /* 고양이 무늬 갈색 */
+            --bg-cream: #fffbeb;
+            /* 부드러운 크림색 배경 */
+            --text-main: #4a3e31;
+            /* 진한 고양이 털색 */
+            --link-blue: #0969da;
+            --border-soft: #e7d4b5;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            font-family: "Nanum Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             line-height: 1.6;
-            color: #24292f;
-            background-color: #f6f8fa;
+            color: var(--text-main);
+            background-color: var(--bg-cream);
+            /* 전체 배경 변경 */
             max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
+            /* 배경에 은은한 발바닥 패턴 추가 */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><text y="20" font-size="20">🐾</text></svg>');
+            background-size: 80px;
         }
 
         .header-container {
             background-color: #ffffff;
             padding: 30px;
-            border-radius: 8px;
-            border: 1px solid #d0d7de;
+            border-radius: 20px;
+            /* 더 둥글게 */
+            border: 2px solid var(--cat-orange);
+            /* 포인트 컬러 보더 */
             margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 10px rgba(253, 186, 116, 0.15);
+            /* 부드러운 오렌지색 그림자 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 헤더에 몰래 숨은 고양이 */
+        .header-container::after {
+            content: "🐈";
+            font-size: 3em;
+            position: absolute;
+            bottom: -5px;
+            right: 15px;
+            opacity: 0.8;
         }
 
         h1 {
             font-size: 2em;
             margin-top: 0;
-            border-bottom: 2px solid #fdba74;
-            /* 고양이 치즈색 포인트 */
+            color: var(--cat-brown);
+            /* 제목 색상 갈색으로 */
             padding-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 제목 밑줄을 발바닥 모양으로 대체 */
+        h1::after {
+            content: "🐾 🐾 🐾 🐾 🐾";
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            font-size: 0.5em;
+            letter-spacing: 5px;
+            color: var(--cat-orange);
+        }
+
+        h2 {
+            color: var(--cat-brown);
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: "🐟 ";
+            /* 생선 추가 */
+            font-size: 1.2em;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            /* 보더 둥글게 하려고 변경 */
+            border-spacing: 0;
             background-color: #ffffff;
-            border-radius: 8px;
+            border-radius: 15px;
+            /* 표 둥글게 */
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-soft);
         }
 
         th,
         td {
-            padding: 12px 16px;
+            padding: 15px 20px;
             text-align: left;
-            border-bottom: 1px solid #d0d7de;
+            border-bottom: 1px solid var(--border-soft);
         }
 
         th {
-            background-color: #f6f8fa;
-            font-weight: 600;
+            background-color: #fef3c7;
+            /* 더 노란색 헤더 */
+            font-weight: 700;
+            color: var(--cat-brown);
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        /* 마지막 행 보더 제거 */
+        tr:last-child td {
+            border-bottom: none;
         }
 
         tr:hover {
-            background-color: #fef3c7;
-            /* 마우스 오버 시 따뜻한 색상 */
+            background-color: #fffbeb;
+            /* 따뜻한 치즈색으로 변경 */
+        }
+
+        /* 주차 글씨 강조 */
+        tbody tr td:first-child {
+            color: var(--cat-orange);
+            font-weight: 700;
         }
 
         a {
-            color: #0969da;
+            color: var(--link-blue);
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.2s;
         }
 
         a:hover {
+            color: var(--cat-orange);
+            /* 링크 호버 시 치즈색으로 */
             text-decoration: underline;
         }
 
         .status-badge {
-            background-color: #fff8c5;
-            color: #9a6700;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            border: 1px solid #e2c08d;
+            background-color: #fef2f2;
+            /* 약간 핑크빛 */
+            color: #ef4444;
+            /* 빨간색 텍스트 */
+            padding: 4px 10px;
+            border-radius: 20px;
+            /* 더 둥글게 */
+            font-size: 0.8em;
+            border: 1px solid #fecaca;
+            font-weight: 500;
+        }
+
+        /* 웹 실행하기 버튼 아이콘 커스텀 */
+        a[href*="/"]::before {
+            content: "🐾 ";
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -84,7 +176,7 @@
 
     <div class="header-container">
         <h1>📦 2026-1 블록체인 실습 대시보드</h1>
-        <p>이 웹페이지는 블록체인 실습 수업의 매주 차 실습 과제와 코드를 기록하는 포털입니다.</p>
+        <p>이 웹페이지는 블록체인 실습 수업의 매주 차 실습 과제와 코드를 기록하는 갱집사의 포털입니다.</p>
         <p>🐈 <strong></strong> 아래 표에서 <code>[웹에서 실행하기]</code>를 클릭하시면 각 실습 결과물을 바로 확인하실 수 있습니다.</p>
     </div>
 
@@ -100,31 +192,33 @@
         </thead>
         <tbody>
             <tr>
-                <td><strong>Week 5</strong></td>
+                <td>Week 5</td>
                 <td>Solidity Lab 시뮬레이터</td>
-                <td><a href="https://github.com/chng-git/chng-git.github.io/tree/main/week5_solidity-lab1-simulator">코드
+                <td><a href="https://github.com/chng-git/chng-git.github.io/tree/main/week5_solidity-lab1-simulator">폴더
                         보기</a></td>
-                <td><a href="/week5_solidity-lab1-simulator">🚀 웹에서 실행하기</a></td>
+                <td><a href="/week5_solidity-lab1-simulator">웹에서 실행하기</a></td>
             </tr>
             <tr>
-                <td><strong>Week 3</strong></td>
+                <td>Week 3</td>
                 <td>Ethereum Testnet 실습</td>
-                <td><a href="https://github.com/chng-git/chng-git.github.io/tree/main/week3_ethereum-testnet">코드 보기</a>
+                <td><a href="https://github.com/chng-git/chng-git.github.io/tree/main/week3_ethereum-testnet">폴더 보기</a>
                 </td>
-                <td><a href="/week3_ethereum-testnet">🚀 웹에서 실행하기</a></td>
+                <td><a href="/week3_ethereum-testnet">웹에서 실행하기</a></td>
             </tr>
             <tr>
-                <td><strong>Week 2</strong></td>
+                <td>Week 2</td>
                 <td>Ethereum RPC Practice</td>
-                <td><a href="https://github.com/chng-git/chng-git.github.io/tree/main/week2_rpc-practice">폴더 보기</a></td>
+                <td><a href="https://github.com/chng-git/chng-git.github.io/tree/main/week2_ethereum-rpc-practice">폴더
+                        보기</a></td>
                 <td><span class="status-badge">웹 UI 없음</span></td>
             </tr>
             <tr>
-                <td><strong>Week 1</strong></td>
+                <td>Week 1</td>
                 <td>블록체인 기초 과제</td>
-                <td><a href="https://github.com/chng-git/chng-git.github.io/tree/main/week1_blockchain-basics">코드 보기</a>
+                <td><a href="https://github.com/chng-git/chng-git.github.io/tree/main/week1_blockchain-ethereum-basics">폴더
+                        보기</a>
                 </td>
-                <td><a href="/week1_blockchain-basics">🚀 웹에서 실행하기</a></td>
+                <td><a href="/week1_blockchain-ethereum-basics">웹에서 실행하기</a></td>
             </tr>
         </tbody>
     </table>
