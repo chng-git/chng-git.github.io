@@ -1,10 +1,13 @@
-# 📦 2026-1 블록체인 실습
-- **학번:** [20221530]
-- **이름:** [박채원]
+# 2026-1 블록체인 실습
 
-이 레포지토리는 2026년 1학기 블록체인 실습 수업의 매주 차 실습 과제와 코드를 기록하는 공간입니다.
+이 레포지토리는 20221530 박채원의 2026년 1학기 블록체인 실습 수업의 매주 차 실습 과제와 코드를 기록하는 공간입니다.
+[🚀 웹에서 실행하기](https://chng-git.github.io/)
+
+<br>
 
 ---
+
+<br>
 
 ## 📚 Assignment List
 
@@ -15,6 +18,8 @@
 | **Week 2** | Ethereum RPC Practice | [📁 소스 보기](./week2_ethereum-rpc-practice) | (UI 없음) |
 | **Week 1** | 블록체인 기초 과제 | [📁 소스 보기](./week1_bitcoin-ethereum-prices) | [🚀 웹에서 실행하기](https://chng-git.github.io/week1_bitcoin-ethereum-prices) |
 ---
+
+<br>
 
 ## 🛠️ Tech Stack & Environment
 - **Languages:** HTML5, CSS3, JavaScript, Solidity
