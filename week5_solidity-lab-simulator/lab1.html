@@ -56,18 +56,6 @@
             }
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         @keyframes slideInRight {
             from {
                 transform: translateX(100%);
@@ -77,22 +65,6 @@
             to {
                 transform: translateX(0);
                 opacity: 1;
-            }
-        }
-
-        @keyframes miningPulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(0.95);
-                box-shadow: 0 0 30px var(--neon-cyan);
-            }
-
-            100% {
-                transform: scale(1.5);
-                opacity: 0;
             }
         }
 
@@ -106,63 +78,10 @@
             }
         }
 
-        /* --- 2. 런처 --- */
-        #launcher {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
-            background: radial-gradient(circle at center, transparent 0%, var(--bg-deep) 100%);
-        }
-
-        .lab-card {
-            background-color: var(--bg-surface);
-            border: 2px solid var(--neon-purple);
-            border-radius: 12px;
-            padding: 2rem;
-            width: 340px;
-            cursor: pointer;
-            transition: 0.3s;
-            position: relative;
-            box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
-            animation: slideUp 0.6s ease-out forwards;
-            z-index: 2;
-        }
-
-        .lab-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-        }
-
-        .lab-card.mining {
-            pointer-events: none;
-            animation: miningPulse 0.6s ease-out forwards;
-        }
-
-        .progress-container {
-            width: 100%;
-            background: var(--bg-elevated);
-            border-radius: 10px;
-            height: 8px;
-            margin-top: 15px;
-            overflow: hidden;
-            border: 1px solid var(--border-muted);
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
-        /* --- 3. 메인 레이아웃 --- */
+        /* --- 2. 메인 레이아웃 --- */
+        /* 이제 런처가 없으므로 처음부터 flex로 보여줍니다 */
         #lab-container {
-            display: none;
+            display: flex;
             height: 100vh;
             flex-direction: column;
             animation: fadeIn 0.5s ease-out;
@@ -214,7 +133,7 @@
             gap: 15px;
         }
 
-        /* --- 4. 에디터 --- */
+        /* --- 3. 에디터 --- */
         .editor-tabs {
             display: flex;
             border-bottom: 1px solid var(--border-muted);
@@ -366,7 +285,7 @@
             color: var(--neon-cyan);
         }
 
-        /* --- 5. UI 요소 & 컴포넌트 --- */
+        /* --- 4. UI 요소 & 컴포넌트 --- */
         .btn {
             background: transparent;
             border-radius: 6px;
@@ -643,7 +562,6 @@
             z-index: 10000;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.2s;
         }
 
         .modal-content {
@@ -676,22 +594,24 @@
             <ul style="list-style: none; padding: 0; margin: 0; color: var(--text-main); font-size: 0.9rem;">
                 <li
                     style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
-                    <span>Lab 1 이동</span> <kbd>1</kbd></li>
+                    <span>런처로 복귀</span> <kbd>Escape</kbd>
+                </li>
                 <li
                     style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
-                    <span>런처로 복귀</span> <kbd>Escape</kbd></li>
+                    <span>현재 Lab 컴파일</span> <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
+                </li>
                 <li
                     style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
-                    <span>현재 Lab 컴파일</span> <kbd>Ctrl</kbd> + <kbd>Enter</kbd></li>
+                    <span>현재 Lab 배포</span> <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd>
+                </li>
                 <li
                     style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
-                    <span>현재 Lab 배포</span> <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd></li>
+                    <span>단축키 도움말 모달</span> <kbd>Ctrl</kbd> + <kbd>/</kbd>
+                </li>
                 <li
                     style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
-                    <span>단축키 도움말 모달</span> <kbd>Ctrl</kbd> + <kbd>/</kbd></li>
-                <li
-                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
-                    <span>콘솔 토글</span> <kbd>Ctrl</kbd> + <kbd>`</kbd></li>
+                    <span>콘솔 토글</span> <kbd>Ctrl</kbd> + <kbd>`</kbd>
+                </li>
             </ul>
             <button class="btn" style="margin-top:20px; margin-bottom:0; border-color:var(--border-muted);"
                 onclick="toggleModal()">닫기</button>
@@ -700,53 +620,11 @@
 
     <div id="toast-container"></div>
 
-    <div id="launcher">
-        <div
-            style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: -15px; z-index: 1; text-shadow: 0 0 10px rgba(0,212,255,0.5);">
-            🔗</div>
-
-        <div class="lab-card" id="lab1-card" onclick="launchLab()">
-            <h2 style="margin:0 0 15px 0; color:var(--neon-cyan);">Lab 1: Hello World</h2>
-
-            <div
-                style="font-size: 0.8rem; color: var(--text-main); margin-bottom: 15px; display: flex; justify-content: center; gap: 15px;">
-                <span
-                    style="background: var(--bg-elevated); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-muted);">난이도:
-                    <span style="color:var(--neon-orange);">기초 ★☆☆</span></span>
-                <span
-                    style="background: var(--bg-elevated); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-muted);">소요시간:
-                    <span style="color:var(--neon-green);">~15분</span></span>
-            </div>
-
-            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
-                <span
-                    style="background: rgba(0, 212, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-family: var(--font-code);">string</span>
-                <span
-                    style="background: rgba(124, 58, 237, 0.1); border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-family: var(--font-code);">public</span>
-                <span
-                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--neon-green); color: var(--neon-green); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-family: var(--font-code);">view</span>
-                <span
-                    style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--neon-orange); color: var(--neon-orange); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-family: var(--font-code);">int</span>
-            </div>
-
-            <div class="progress-container">
-                <div class="progress-bar" id="launcher-progress"></div>
-            </div>
-            <p style="font-size: 0.8rem; color: var(--neon-purple); margin-top: 8px; margin-bottom: 0;"
-                id="launcher-progress-txt">0/3 Labs 완료</p>
-            <button class="btn" onclick="resetProgress(event)"
-                style="margin-top:15px; font-size:0.75rem; padding:6px; border-color:var(--border-muted);">진행률
-                초기화</button>
-        </div>
-        <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted);">단축키 <kbd>Ctrl</kbd> + <kbd>/</kbd> 를
-            눌러 도움말 보기</div>
-    </div>
-
     <div id="lab-container">
         <header>
             <div style="color:var(--neon-cyan); font-weight:bold;">Lab 1 Workspace</div>
-            <button class="btn" style="width:auto; margin:0; padding:5px 15px;" onclick="returnToLauncher()">Esc 런처
-                복귀</button>
+            <button class="btn" style="width:auto; margin:0; padding:5px 15px;" onclick="location.href='index.html'">Esc
+                런처 복귀</button>
         </header>
 
         <main>
@@ -791,7 +669,6 @@
                         배포</button>
 
                     <div id="blockchain-state-container"></div>
-
                     <div id="guide-container"></div>
                 </div>
             </div>
@@ -820,56 +697,32 @@
         // --- 0. 배경 캔버스 로직 ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
-        let animationFrameId;
-        let isTabActive = true;
+        let particles = []; let animationFrameId; let isTabActive = true;
 
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
         class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2;
-                this.alpha = Math.random() * 0.5 + 0.1;
-            }
-            update() {
-                this.x += this.vx; this.y += this.vy;
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 212, 255, ${this.alpha})`;
-                ctx.fill();
-            }
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.vx = (Math.random() - 0.5) * 0.5; this.vy = (Math.random() - 0.5) * 0.5; this.size = Math.random() * 2; this.alpha = Math.random() * 0.5 + 0.1; }
+            update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > canvas.width) this.vx *= -1; if (this.y < 0 || this.y > canvas.height) this.vy *= -1; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(0, 212, 255, ${this.alpha})`; ctx.fill(); }
         }
 
-        for(let i=0; i<70; i++) particles.push(new Particle());
+        for (let i = 0; i < 70; i++) particles.push(new Particle());
 
         function animate() {
-            if (!isTabActive) return; // 비활성 시 루프 차단 (성능 최적화)
+            if (!isTabActive) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => { p.update(); p.draw(); });
             animationFrameId = requestAnimationFrame(animate);
         }
         animate();
 
-        // 탭 활성/비활성 감지 최적화
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                isTabActive = false;
-                cancelAnimationFrame(animationFrameId);
-            } else {
-                isTabActive = true;
-                animate();
-            }
+            if (document.hidden) { isTabActive = false; cancelAnimationFrame(animationFrameId); }
+            else { isTabActive = true; animate(); }
         });
+
         // --- 1. 유틸리티 & 로깅 ---
         function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
@@ -921,31 +774,27 @@
             set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } },
             get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }
         };
+
         let progress = JSON.parse(SafeStorage.get('lab1_progress') || '{"0":false,"1":false,"2":false}');
 
         function completeCurrentTab() {
             if (!progress[currentTab]) {
-                progress[currentTab] = true; SafeStorage.set('lab1_progress', JSON.stringify(progress));
-                showToast(`탭 ${currentTab + 1} 실습 완료!`, 'success'); updateProgressUI();
-            }
-        }
-        function updateProgressUI() {
-            let completed = Object.values(progress).filter(Boolean).length; let percent = Math.floor((completed / 3) * 100);
-            const bar = document.getElementById('launcher-progress');
-            if (bar) { bar.style.width = `${percent}%`; document.getElementById('launcher-progress-txt').innerText = `${completed}/3 Labs 완료`; }
-            document.querySelectorAll('.tab-btn').forEach((btn, i) => { if (progress[i]) btn.classList.add('completed'); else btn.classList.remove('completed'); });
-        }
-        function resetProgress(e) {
-            e.stopPropagation();
-            if (confirm('진행률과 저장된 코드를 모두 초기화할까요?')) {
-                progress = { 0: false, 1: false, 2: false }; SafeStorage.set('lab1_progress', JSON.stringify(progress));
-                [0, 1, 2].forEach(i => SafeStorage.set(`lab1_code_${i}`, ''));
-                updateProgressUI(); showToast('초기화 되었습니다.', 'warning');
+                progress[currentTab] = true;
+                SafeStorage.set('lab1_progress', JSON.stringify(progress));
+                showToast(`탭 ${currentTab + 1} 실습 완료!`, 'success');
+                updateProgressUI();
             }
         }
 
+        function updateProgressUI() {
+            // 이제 로비 런처 카드가 없으므로, 상단 탭 버튼의 체크 마크(✔)만 업데이트합니다.
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+                if (progress[i]) btn.classList.add('completed');
+                else btn.classList.remove('completed');
+            });
+        }
+
         // --- 4. 계정 렌더링 & 탭 스위치 ---
-        // 계정 렌더링 및 UI 컨트롤
         function renderAccounts() {
             const sel = document.getElementById('account-select');
             if (sel.options.length === 0) {
@@ -954,27 +803,23 @@
                 ).join('');
             }
             const currentAcc = BlockchainEngine.accounts[sel.value];
-
             const infoContainer = document.getElementById('account-info-container');
             if (infoContainer) {
                 infoContainer.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="color:var(--neon-cyan);">잔액</span>
-                <span style="color:var(--text-main); font-size:0.9rem;">${currentAcc.balance.toFixed(4)} ETH</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="color:var(--neon-cyan);">msg.sender</span>
-                <span style="color:var(--text-muted); font-size:0.85rem;">${currentAcc.address.substring(0, 8)}...${currentAcc.address.substring(36)}</span>
-            </div>
-        `;
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--neon-cyan);">잔액</span>
+                    <span style="color:var(--text-main); font-size:0.9rem;">${currentAcc.balance.toFixed(4)} ETH</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--neon-cyan);">msg.sender</span>
+                    <span style="color:var(--text-muted); font-size:0.85rem;">${currentAcc.address.substring(0, 8)}...${currentAcc.address.substring(36)}</span>
+                </div>`;
             }
         }
 
         function switchTab(idx) {
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
             currentTab = idx;
-
-            // 저장된 코드 불러오기 (자동 저장 연동)
             const savedCode = SafeStorage.get(`lab1_code_${idx}`);
             document.getElementById('code-editor').value = savedCode || Labs[idx].code;
 
@@ -985,12 +830,11 @@
             syncEditor(); renderAccounts(); updateProgressUI();
         }
 
-        // --- 5. 에디터 엔진 (동기 스크롤, 자동 저장, 복사/초기화) ---
+        // --- 5. 에디터 엔진 ---
         const editorContent = document.getElementById('editor-scroll-area');
         const lineNumbers = document.getElementById('line-numbers');
         const codeEditor = document.getElementById('code-editor');
 
-        // 줄 번호 동기 스크롤
         editorContent.addEventListener('scroll', () => { lineNumbers.scrollTop = editorContent.scrollTop; });
 
         function syncEditor() {
@@ -1007,7 +851,7 @@
             const linesCount = txt.split('\n').length;
             lineNumbers.innerHTML = Array(linesCount).fill(0).map((_, i) => i + 1).join('<br>');
 
-            SafeStorage.set(`lab1_code_${currentTab}`, txt); // 자동 저장
+            SafeStorage.set(`lab1_code_${currentTab}`, txt);
             updateCursorPosition();
         }
 
@@ -1018,12 +862,10 @@
             document.getElementById('cursor-position').innerText = `줄 ${lines.length}, 열 ${lines[lines.length - 1].length + 1}`;
         }
 
-        // 에디터 이벤트 바인딩
         codeEditor.addEventListener('input', () => { isCompiled = false; syncEditor(); });
         codeEditor.addEventListener('click', updateCursorPosition);
         codeEditor.addEventListener('keyup', updateCursorPosition);
         codeEditor.addEventListener('keydown', e => {
-            // Tab 키 2칸 들여쓰기 구현
             if (e.key === 'Tab') {
                 e.preventDefault();
                 const s = codeEditor.selectionStart, end = codeEditor.selectionEnd;
@@ -1048,7 +890,7 @@
             isCompiled = false;
         }
 
-        // --- 6. 파서 & 배포 & 함수 실행 (가상 컴파일러) ---
+        // --- 6. 파서 & 배포 & 함수 실행 ---
         function compileCode() {
             const code = codeEditor.value.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, '');
             if (!code.includes('contract')) return showToast('contract 키워드가 없습니다.', 'error');
@@ -1132,32 +974,21 @@
             updateRealtimeState(targetVar); completeCurrentTab();
         }
 
-        // --- 7. 라우팅 및 단축키 ---
-        function launchLab() { document.getElementById('lab1-card').classList.add('mining'); setTimeout(() => { window.location.hash = 'lab1'; document.getElementById('lab1-card').classList.remove('mining'); }, 600); }
-        function returnToLauncher() { window.location.hash = ''; }
-
-        window.addEventListener('hashchange', () => {
-            if (window.location.hash === '#lab1') { document.getElementById('launcher').style.display = 'none'; document.getElementById('lab-container').style.display = 'flex'; switchTab(0); }
-            else { document.getElementById('launcher').style.display = 'flex'; document.getElementById('lab-container').style.display = 'none'; updateProgressUI(); }
-        });
-
+        // --- 7. 초기화 및 단축키 ---
         window.addEventListener('load', () => {
             updateProgressUI();
-            if (window.location.hash === '#lab1') { document.getElementById('launcher').style.display = 'none'; document.getElementById('lab-container').style.display = 'flex'; switchTab(0); }
+            switchTab(0); // 로드 시 첫 번째 탭으로 바로 초기화
         });
 
         function toggleModal() { const m = document.getElementById('shortcut-modal'); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
 
         // 통합 단축키 핸들러
         document.addEventListener('keydown', e => {
-            // 1: Lab 1 이동 (입력창 밖에서만)
-            if (e.key === '1' && document.activeElement.tagName !== 'TEXTAREA' && window.location.hash !== '#lab1') { e.preventDefault(); launchLab(); }
-
-            // Escape: 모달 닫기 또는 런처로 복귀
+            // Escape: 모달 닫기 또는 index.html로 라우팅
             if (e.key === 'Escape') {
                 const modal = document.getElementById('shortcut-modal');
                 if (modal.style.display === 'flex') modal.style.display = 'none';
-                else returnToLauncher();
+                else window.location.href = 'index.html';
             }
 
             // Ctrl + Enter: 컴파일

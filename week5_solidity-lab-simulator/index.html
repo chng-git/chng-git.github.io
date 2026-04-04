@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solidity Labs | Main Lobby</title>
+    <style>
+        /* --- 1. 테마 & 애니메이션 --- */
+        :root {
+            --bg-deep: #0a0e27;
+            --bg-surface: #111633;
+            --bg-elevated: #1a1f4a;
+            --neon-cyan: #00d4ff;
+            --neon-purple: #7c3aed;
+            --neon-green: #10b981;
+            --neon-orange: #f59e0b;
+            --neon-red: #ef4444;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-muted: #2a2f5a;
+            --font-code: 'Consolas', 'Fira Code', monospace;
+            --font-ui: 'Segoe UI', 'Malgun Gothic', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- 2. 로비 UI 타이틀 --- */
+        .lobby-header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
+            z-index: 2;
+        }
+
+        .lobby-title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            font-family: var(--font-code);
+            letter-spacing: 2px;
+        }
+
+        .lobby-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* --- 3. 카드 컨테이너 & 개별 카드 --- */
+        .cards-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            z-index: 2;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        .lab-card {
+            background-color: var(--bg-surface);
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 320px;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out backwards;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 랩별 고유 테마 색상 */
+        .card-lab1 {
+            border-color: var(--neon-purple);
+            animation-delay: 0.1s;
+        }
+
+        .card-lab1:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.4);
+        }
+
+        .card-lab1 h2 {
+            color: var(--neon-purple);
+        }
+
+        .card-lab2 {
+            border-color: var(--neon-cyan);
+            animation-delay: 0.2s;
+        }
+
+        .card-lab2:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+        }
+
+        .card-lab2 h2 {
+            color: var(--neon-cyan);
+        }
+
+        .card-lab3 {
+            border-color: var(--neon-orange);
+            animation-delay: 0.3s;
+        }
+
+        .card-lab3:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .card-lab3 h2 {
+            color: var(--neon-orange);
+        }
+
+        .lab-card h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .meta-info {
+            font-size: 0.8rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .meta-badge {
+            background: var(--bg-elevated);
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-muted);
+        }
+
+        .tag-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            flex-grow: 1;
+            align-content: flex-start;
+        }
+
+        .tag {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-family: var(--font-code);
+            border: 1px solid;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- 4. 통합 진행률 대시보드 --- */
+        .total-progress-panel {
+            margin-top: 50px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 10px;
+            padding: 20px;
+            width: 600px;
+            text-align: center;
+            z-index: 2;
+            animation: fadeIn 0.8s ease-out backwards;
+            animation-delay: 0.4s;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-muted);
+            margin-top: 15px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan), var(--neon-orange));
+            width: 0%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--border-muted);
+            border-radius: 6px;
+            padding: 8px 15px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            color: var(--neon-red);
+            border-color: var(--neon-red);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* --- 5. 단축키 모달 CSS --- */
+        #shortcut-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 25px;
+            width: 450px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        kbd {
+            background: var(--bg-elevated);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-code);
+            color: var(--neon-orange);
+            border: 1px solid var(--border-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="shortcut-modal" onclick="toggleModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-top: 0; color: var(--neon-cyan);">⌨️ 키보드 단축키 도움말</h3>
+            <ul style="list-style: none; padding: 0; margin: 0; color: var(--text-main); font-size: 0.9rem;">
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>Lab 1 이동</span> <kbd>1</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>Lab 2 이동</span> <kbd>2</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>Lab 3 이동</span> <kbd>3</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>런처로 복귀</span> <kbd>Escape</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>현재 Lab 컴파일</span> <span><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>현재 Lab 배포</span> <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd></span></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>단축키 도움말 모달</span> <span><kbd>Ctrl</kbd> + <kbd>/</kbd></span></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>콘솔 토글</span> <span><kbd>Ctrl</kbd> + <kbd>`</kbd></span></li>
+            </ul>
+            <button class="btn" style="margin-top:20px; margin-bottom:0; border-color:var(--border-muted); width: 100%;"
+                onclick="toggleModal()">닫기</button>
+        </div>
+    </div>
+
+    <div class="lobby-header">
+        <h1 class="lobby-title">Solidity Lab Hub</h1>
+        <div class="lobby-subtitle">스마트 컨트랙트 실습 환경에 오신 것을 환영합니다.</div>
+    </div>
+
+    <div class="cards-container">
+        <div class="lab-card card-lab1" onclick="location.href='lab1.html'">
+            <h2>Lab 1: Hello World</h2>
+            <div class="meta-info">
+                <span class="meta-badge">난이도: <span style="color:var(--neon-green);">기초 ★☆☆</span></span>
+                <span class="meta-badge">소요시간: <span style="color:var(--text-muted);">~15분</span></span>
+            </div>
+            <div class="tag-container">
+                <span class="tag" style="color:var(--neon-cyan); border-color:var(--neon-cyan);">string</span>
+                <span class="tag" style="color:var(--neon-purple); border-color:var(--neon-purple);">public</span>
+                <span class="tag" style="color:var(--neon-green); border-color:var(--neon-green);">view</span>
+                <span class="tag" style="color:var(--neon-orange); border-color:var(--neon-orange);">int</span>
+            </div>
+            <div style="text-align:center; font-size:0.85rem; color:var(--text-muted);" id="status-lab1">진행률 계산 중...
+            </div>
+        </div>
+
+        <div class="lab-card card-lab2" onclick="location.href='lab2.html'">
+            <h2>Lab 2: Counter & Check</h2>
+            <div class="meta-info">
+                <span class="meta-badge">난이도: <span style="color:var(--neon-orange);">초급 ★★☆</span></span>
+                <span class="meta-badge">소요시간: <span style="color:var(--text-muted);">~20분</span></span>
+            </div>
+            <div class="tag-container">
+                <span class="tag" style="color:var(--neon-cyan); border-color:var(--neon-cyan);">uint</span>
+                <span class="tag" style="color:var(--neon-purple); border-color:var(--neon-purple);">revert</span>
+                <span class="tag" style="color:var(--neon-green); border-color:var(--neon-green);">pure</span>
+            </div>
+            <div style="text-align:center; font-size:0.85rem; color:var(--text-muted);" id="status-lab2">진행률 계산 중...
+            </div>
+        </div>
+
+        <div class="lab-card card-lab3" onclick="location.href='lab3.html'">
+            <h2>Lab 3: Faucet Master</h2>
+            <div class="meta-info">
+                <span class="meta-badge">난이도: <span style="color:var(--neon-red);">고급 ★★★</span></span>
+                <span class="meta-badge">소요시간: <span style="color:var(--text-muted);">~30분</span></span>
+            </div>
+            <div class="tag-container">
+                <span class="tag" style="color:var(--neon-red); border-color:var(--neon-red);">payable</span>
+                <span class="tag" style="color:var(--neon-cyan); border-color:var(--neon-cyan);">msg.value</span>
+                <span class="tag" style="color:var(--neon-purple); border-color:var(--neon-purple);">modifier</span>
+                <span class="tag" style="color:var(--neon-orange); border-color:var(--neon-orange);">timestamp</span>
+            </div>
+            <div style="text-align:center; font-size:0.85rem; color:var(--text-muted);" id="status-lab3">진행률 계산 중...
+            </div>
+        </div>
+    </div>
+
+    <div class="total-progress-panel">
+        <div style="font-weight:bold; color:var(--text-main); font-size:1.1rem;">전체 마스터리 달성률</div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="total-progress-bar"></div>
+        </div>
+        <div style="margin-top:10px; font-size:0.9rem; color:var(--text-muted);" id="total-progress-text">총 0/9 태스크 완료
+        </div>
+        <button class="btn" onclick="resetAllProgress()">🚨 모든 진행률 초기화</button>
+    </div>
+
+    <div
+        style="margin-top: 30px; font-size: 0.85rem; color: var(--text-muted); z-index: 2; text-align: center; animation: fadeIn 0.8s ease-out backwards; animation-delay: 0.6s;">
+        단축키 <kbd>Ctrl</kbd> + <kbd>/</kbd> 를 눌러 도움말 보기
+    </div>
+
+    <script>
+        // --- 배경 파티클 ---
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        class Particle {
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.vx = (Math.random() - 0.5) * 0.5; this.vy = (Math.random() - 0.5) * 0.5; this.size = Math.random() * 2; this.alpha = Math.random() * 0.5 + 0.1; }
+            update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > canvas.width) this.vx *= -1; if (this.y < 0 || this.y > canvas.height) this.vy *= -1; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(0, 212, 255, ${this.alpha})`; ctx.fill(); }
+        }
+        for (let i = 0; i < 80; i++) particles.push(new Particle());
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        animate();
+
+        // --- 로컬 스토리지에서 진행률 읽어오기 ---
+        function calculateProgress() {
+            let totalTasks = 9;
+            let completedTasks = 0;
+
+            for (let i = 1; i <= 3; i++) {
+                try {
+                    let progressData = JSON.parse(localStorage.getItem(`lab${i}_progress`) || '{"0":false,"1":false,"2":false}');
+                    let completedInLab = Object.values(progressData).filter(Boolean).length;
+                    completedTasks += completedInLab;
+
+                    let statusEl = document.getElementById(`status-lab${i}`);
+                    if (completedInLab === 3) {
+                        statusEl.innerHTML = `<span style="color:var(--neon-green);">완료됨 (3/3) ✅</span>`;
+                    } else {
+                        statusEl.innerHTML = `진행 중 (${completedInLab}/3)`;
+                    }
+                } catch (e) {
+                    console.error("진행률 파싱 에러", e);
+                }
+            }
+
+            let percent = Math.floor((completedTasks / totalTasks) * 100);
+            document.getElementById('total-progress-bar').style.width = `${percent}%`;
+            document.getElementById('total-progress-text').innerText = `총 ${completedTasks}/${totalTasks} 태스크 완료 (${percent}%)`;
+        }
+
+        function resetAllProgress() {
+            if (confirm('모든 랩의 진행률과 코드가 초기화됩니다. 정말 지우시겠습니까?')) {
+                for (let i = 1; i <= 3; i++) {
+                    localStorage.setItem(`lab${i}_progress`, '{"0":false,"1":false,"2":false}');
+                    for (let j = 0; j < 3; j++) localStorage.setItem(`lab${i}_code_${j}`, '');
+                }
+                calculateProgress();
+                alert('초기화가 완료되었습니다.');
+            }
+        }
+
+        window.addEventListener('load', calculateProgress);
+
+        // --- 단축키 및 모달 제어 시스템 ---
+        function toggleModal() {
+            const m = document.getElementById('shortcut-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        document.addEventListener('keydown', e => {
+            // Lab 이동 단축키
+            if (e.key === '1') { e.preventDefault(); window.location.href = 'lab1.html'; }
+            if (e.key === '2') { e.preventDefault(); window.location.href = 'lab2.html'; }
+            if (e.key === '3') { e.preventDefault(); window.location.href = 'lab3.html'; }
+
+            // Escape: 모달이 열려있으면 닫기
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('shortcut-modal');
+                if (modal.style.display === 'flex') modal.style.display = 'none';
+            }
+
+            // Ctrl + /: 도움말 모달 토글
+            if (e.ctrlKey && e.key === '/') {
+                e.preventDefault();
+                toggleModal();
+            }
+        });
+    </script>
+</body>
+
+</html>

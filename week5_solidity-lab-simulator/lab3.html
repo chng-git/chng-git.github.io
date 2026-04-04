@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solidity Lab Simulator | Lab 3</title>
+    <style>
+        /* --- 1. 테마 & 애니메이션 --- */
+        :root {
+            --bg-deep: #0a0e27;
+            --bg-surface: #111633;
+            --bg-elevated: #1a1f4a;
+            --neon-cyan: #00d4ff;
+            --neon-purple: #7c3aed;
+            --neon-green: #10b981;
+            --neon-orange: #f59e0b;
+            --neon-red: #ef4444;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-muted: #2a2f5a;
+            --font-code: 'Consolas', 'Fira Code', monospace;
+            --font-ui: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            --panel-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes highlightBlink {
+            0% {
+                background-color: rgba(16, 185, 129, 0.5);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        /* --- 2. 메인 레이아웃 (런처 제거 후 항상 flex 유지) --- */
+        #lab-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        header {
+            height: 45px;
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        main {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr;
+            gap: 15px;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        .panel {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--panel-shadow);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background-color: var(--bg-elevated);
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border-muted);
+        }
+
+        .panel-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* --- 3. 에디터 --- */
+        .editor-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-muted);
+            background-color: var(--bg-elevated);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 12px 15px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-right: 1px solid var(--border-muted);
+            font-family: var(--font-ui);
+        }
+
+        .tab-btn.active {
+            color: var(--neon-cyan);
+            background-color: var(--bg-surface);
+            font-weight: bold;
+            border-bottom: 2px solid var(--neon-cyan);
+        }
+
+        .tab-btn .check {
+            display: none;
+            color: var(--neon-green);
+            margin-left: 5px;
+        }
+
+        .tab-btn.completed .check {
+            display: inline;
+        }
+
+        .editor-wrapper {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            background-color: rgba(10, 14, 39, 0.8);
+            overflow: hidden;
+            font-family: var(--font-code);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        #line-numbers {
+            padding: 15px 10px;
+            background-color: var(--bg-elevated);
+            color: var(--text-muted);
+            text-align: right;
+            width: 40px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-muted);
+            overflow: hidden;
+        }
+
+        .editor-content {
+            position: relative;
+            flex-grow: 1;
+            overflow: auto;
+        }
+
+        #highlight-layer {
+            margin: 0;
+            padding: 15px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: max-content;
+            min-width: 100%;
+            pointer-events: none;
+            white-space: pre;
+            color: var(--text-main);
+        }
+
+        textarea#code-editor {
+            margin: 0;
+            padding: 15px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            color: transparent;
+            caret-color: var(--neon-cyan);
+            border: none;
+            resize: none;
+            outline: none;
+            white-space: pre;
+            font-family: var(--font-code);
+            font-size: 14px;
+            line-height: 1.6;
+            tab-size: 4;
+        }
+
+        .token-keyword {
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+
+        .token-type {
+            color: var(--neon-purple);
+        }
+
+        .token-string {
+            color: var(--neon-green);
+        }
+
+        .token-number {
+            color: var(--neon-orange);
+        }
+
+        .token-comment {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .token-function {
+            color: #60a5fa;
+        }
+
+        .editor-footer {
+            background-color: var(--bg-elevated);
+            padding: 8px 15px;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-muted);
+            color: var(--text-muted);
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: 1px solid var(--border-muted);
+            color: var(--text-muted);
+            border-radius: 4px;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        /* --- 4. UI 요소 & 컴포넌트 --- */
+        .btn {
+            background: transparent;
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.2s;
+            text-align: center;
+            border: 1px solid var(--border-muted);
+        }
+
+        .btn.compile {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .btn.compile:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .btn.deploy {
+            border-color: var(--neon-orange);
+            color: var(--neon-orange);
+        }
+
+        .btn.deploy:hover {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .btn.time-skip {
+            border-color: var(--neon-purple);
+            color: var(--neon-purple);
+            margin-top: 10px;
+        }
+
+        .btn.time-skip:hover {
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-muted);
+        }
+
+        .status-box {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-muted);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .status-box .val {
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: var(--font-code);
+        }
+
+        .status-box .label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+
+        .contract-module {
+            border: 1px solid var(--border-muted);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .contract-header {
+            background: var(--bg-elevated);
+            padding: 8px 10px;
+            font-size: 0.85rem;
+            font-family: var(--font-code);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-muted);
+        }
+
+        .contract-body {
+            padding: 10px;
+            background: var(--bg-surface);
+        }
+
+        .dashboard-display {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(0, 212, 255, 0.03);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .dashboard-display .title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            font-family: var(--font-code);
+            margin-bottom: 10px;
+        }
+
+        .dashboard-display .value {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            line-height: 1;
+            margin-bottom: 5px;
+            font-family: var(--font-code);
+        }
+
+        .dashboard-display .unit {
+            font-size: 1.2rem;
+            color: var(--neon-green);
+        }
+
+        .func-btn {
+            background: var(--bg-deep);
+            border-radius: 6px;
+            padding: 8px;
+            width: auto;
+            text-align: left;
+            cursor: pointer;
+            font-family: var(--font-code);
+            border: 1px solid var(--border-muted);
+            transition: 0.2s;
+            font-size: 0.85rem;
+            flex-grow: 1;
+        }
+
+        .func-btn.transact {
+            border-left: 4px solid var(--neon-orange);
+            color: var(--text-main);
+        }
+
+        .func-btn.transact:hover {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .func-btn.payable {
+            border-left: 4px solid var(--neon-red);
+            color: var(--text-main);
+        }
+
+        .func-btn.payable:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .func-btn.owner {
+            border-left: 4px solid var(--neon-purple);
+            color: var(--text-main);
+        }
+
+        .func-btn.owner:hover {
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .func-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .func-input {
+            width: 80px;
+            padding: 7px;
+            background: var(--bg-deep);
+            color: white;
+            border: 1px solid var(--border-muted);
+            border-radius: 4px;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            text-align: right;
+        }
+
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--bg-elevated);
+            border-left: 4px solid;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 0.9rem;
+            animation: slideInRight 0.3s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.success {
+            border-color: var(--neon-green);
+        }
+
+        .toast.error {
+            border-color: var(--neon-red);
+        }
+
+        .toast.info {
+            border-color: var(--neon-cyan);
+        }
+
+        .toast.warning {
+            border-color: var(--neon-orange);
+        }
+
+        footer {
+            height: 160px;
+            background-color: var(--bg-deep);
+            border-top: 1px solid var(--border-muted);
+            display: flex;
+            flex-direction: column;
+            transition: height 0.3s;
+        }
+
+        footer.minimized {
+            height: 35px;
+        }
+
+        #console {
+            flex-grow: 1;
+            font-family: var(--font-code);
+            padding: 10px 20px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        #shortcut-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 25px;
+            width: 450px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        kbd {
+            background: var(--bg-elevated);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-code);
+            color: var(--neon-orange);
+            border: 1px solid var(--border-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="shortcut-modal" onclick="toggleModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-top: 0; color: var(--neon-cyan);">⌨️ 키보드 단축키 도움말</h3>
+            <ul style="list-style: none; padding: 0; margin: 0; color: var(--text-main); font-size: 0.9rem;">
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>런처로 복귀</span> <kbd>Escape</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>현재 Lab 컴파일</span> <kbd>Ctrl</kbd> + <kbd>Enter</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>현재 Lab 배포</span> <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>단축키 도움말 모달</span> <kbd>Ctrl</kbd> + <kbd>/</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>콘솔 토글</span> <kbd>Ctrl</kbd> + <kbd>`</kbd></li>
+            </ul>
+            <button class="btn" style="margin-top:20px; margin-bottom:0; border-color:var(--border-muted);"
+                onclick="toggleModal()">닫기</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <div id="lab-container">
+        <header>
+            <div style="color:var(--neon-cyan); font-weight:bold;">Lab 3 Workspace: Faucet Master</div>
+            <button class="btn" style="width:auto; margin:0; padding:5px 15px;"
+                onclick="window.location.href='index.html'">Esc 런처 복귀</button>
+        </header>
+
+        <main>
+            <div class="panel">
+                <div class="editor-tabs">
+                    <button class="tab-btn active" onclick="switchTab(0)">탭1: 기본 Faucet<span
+                            class="check">✔</span></button>
+                    <button class="tab-btn" onclick="switchTab(1)">탭2: 쿨타임 Faucet<span class="check">✔</span></button>
+                    <button class="tab-btn" onclick="switchTab(2)">탭3: Owner Faucet<span class="check">✔</span></button>
+                </div>
+                <div class="editor-wrapper">
+                    <div id="line-numbers">1</div>
+                    <div class="editor-content" id="editor-scroll-area">
+                        <pre id="highlight-layer"></pre>
+                        <textarea id="code-editor" spellcheck="false" wrap="off"></textarea>
+                    </div>
+                </div>
+                <div class="editor-footer">
+                    <span id="cursor-position">줄 1, 열 1</span>
+                    <div style="display:flex; gap:10px;">
+                        <button class="tool-btn" onclick="copyCode()">복사</button>
+                        <button class="tool-btn" onclick="resetCode()">초기화</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">제어 & 가이드</div>
+                <div class="panel-content">
+                    <div>
+                        <select class="btn" id="account-select" onchange="renderAccounts()"
+                            style="background:var(--bg-deep); border:1px solid var(--border-muted); text-align:left; margin-bottom: 5px;"></select>
+                        <div id="account-info-container"
+                            style="font-family:var(--font-code); font-size:0.8rem; margin-bottom:15px; display:flex; flex-direction:column; gap:8px;">
+                        </div>
+                    </div>
+                    <button class="btn compile" onclick="compileCode()">🔨 1. 컴파일</button>
+                    <button class="btn deploy" onclick="deployContract()">🚀 2. 배포</button>
+                    <button class="btn time-skip" onclick="timeSkip()" id="btn-time-skip" style="display:none;">⏩ 24시간
+                        빨리 감기 (Time Skip)</button>
+                    <div id="blockchain-state-container"></div>
+                    <div id="guide-container"
+                        style="font-size:0.85rem; color:var(--text-muted); line-height:1.6; margin-top:15px;"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">배포된 컨트랙트</div>
+                <div class="panel-content" id="interaction-area">
+                    <div style="text-align:center; color:var(--text-muted); margin-top:40px;">새로운 탭입니다. 컴파일을 진행하세요.
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="footer-panel">
+            <div
+                style="padding: 5px 20px; background: var(--bg-elevated); border-bottom: 1px solid var(--border-muted); font-size: 0.8rem; display:flex; justify-content:space-between;">
+                <span>터미널 로깅 (Ctrl+` 토글)</span>
+                <span style="color:var(--text-muted); cursor:pointer;"
+                    onclick="document.getElementById('console').innerHTML=''">지우기</span>
+            </div>
+            <div id="console"></div>
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d');
+        let particles = []; let animationFrameId; let isTabActive = true;
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        class Particle {
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.vx = (Math.random() - 0.5) * 0.5; this.vy = (Math.random() - 0.5) * 0.5; this.size = Math.random() * 2; this.alpha = Math.random() * 0.5 + 0.1; }
+            update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > canvas.width) this.vx *= -1; if (this.y < 0 || this.y > canvas.height) this.vy *= -1; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(0, 212, 255, ${this.alpha})`; ctx.fill(); }
+        }
+        for (let i = 0; i < 70; i++) particles.push(new Particle());
+        function animate() { if (!isTabActive) return; ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); animationFrameId = requestAnimationFrame(animate); }
+        animate();
+        document.addEventListener('visibilitychange', () => { if (document.hidden) { isTabActive = false; cancelAnimationFrame(animationFrameId); } else { isTabActive = true; animate(); } });
+
+        function showToast(msg, type = 'info') { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast ${type}`; const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'; toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`; container.appendChild(toast); setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000); }
+        function logConsole(msg, type = 'info') { const c = document.getElementById('console'); const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'tx' ? '🔶' : 'ℹ️'; c.innerHTML += `<div style="margin-bottom:4px; color: ${type === 'error' ? 'var(--neon-red)' : type === 'tx' ? 'var(--neon-orange)' : type === 'success' ? 'var(--neon-green)' : 'var(--text-main)'}"><span style="color:var(--text-muted)">[${new Date().toLocaleTimeString()}]</span> ${icon} ${msg}</div>`; c.scrollTop = c.scrollHeight; }
+
+        const BlockchainEngine = {
+            blockNumber: 1, timestamp: Math.floor(Date.now() / 1000), gasPrice: 20, chainId: 1337,
+            accounts: [
+                { address: '0xOwner...56beddC4', balance: 100, label: 'Account 1' },
+                { address: '0xUserA...15835cb2', balance: 100, label: 'Account 2' },
+                { address: '0xUserB...e22C02db', balance: 100, label: 'Account 3' },
+                { address: '0xUserC...495cabaB', balance: 100, label: 'Account 4' }
+            ],
+            contractAddress: '', txCount: 0, contractBalance: 0, owner: null, lastWithdrawalTime: {},
+            useGas: function (accountIndex, gasLimit) {
+                const ethCost = (gasLimit * this.gasPrice) / 1e9;
+                this.accounts[accountIndex].balance -= ethCost; this.txCount++; this.blockNumber++;
+                const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''); return { cost: ethCost.toFixed(5), hash: txHash };
+            },
+            resetState: function () { this.contractAddress = ''; this.txCount = 0; this.contractBalance = 0; this.owner = null; this.lastWithdrawalTime = {}; this.timestamp = Math.floor(Date.now() / 1000); }
+        };
+
+        const Labs = [
+            { title: "Basic Faucet", code: "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.26;\n\ncontract BasicFaucet {\n    function deposit() public payable {}\n\n    function withdraw() public {\n        require(address(this).balance >= 0.1 ether, \"Not enough funds\");\n        payable(msg.sender).transfer(0.1 ether);\n    }\n}", guide: `<b>💡 [탭 1 가이드]</b><br><br>가장 기본적인 수도꼭지 컨트랙트입니다.<br>1. <b>deposit</b>에 값을 넣고 호출하여 컨트랙트 잔액을 채웁니다.<br>2. <b>withdraw</b>를 호출하면 지갑으로 0.1 ETH가 전송됩니다.` },
+            { title: "Time Faucet", code: "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.26;\n\ncontract TimeFaucet {\n    mapping(address => uint256) public lastWithdrawalTime;\n\n    function deposit() public payable {}\n\n    function withdraw() public {\n        require(block.timestamp >= lastWithdrawalTime[msg.sender] + 1 days, \"Wait 24 hours\");\n        require(address(this).balance >= 0.1 ether, \"Not enough funds\");\n        \n        lastWithdrawalTime[msg.sender] = block.timestamp;\n        payable(msg.sender).transfer(0.1 ether);\n    }\n}", guide: `<b>💡 [탭 2 가이드]</b><br><br>쿨타임 로직이 추가되었습니다.<br>한 번 출금 후 다시 시도하면 조건 검증(require)에 의해 에러가 발생합니다.<br>이때 <b>[24시간 빨리 감기]</b> 버튼을 눌러 블록 시간을 제어해 보세요.` },
+            { title: "Owner Faucet", code: "// SPDX-License-Identifier: MIT \npragma solidity ^0.8.26;\n\ncontract OwnerFaucet {\n    address public owner;\n    mapping(address => uint256) public lastWithdrawalTime;\n\n    constructor() { owner = msg.sender; }\n    function deposit() public payable {}\n\n    function withdraw() public {\n        require(block.timestamp >= lastWithdrawalTime[msg.sender] + 1 days, \"Wait 24 hours\");\n        lastWithdrawalTime[msg.sender] = block.timestamp;\n        payable(msg.sender).transfer(0.1 ether);\n    }\n\n       function withdrawAll() public {\n        require(msg.sender == owner, \"Only owner\");\n        payable(owner).transfer(address(this).balance);\n    }\n}", guide: `<b>💡 [탭 3 가이드]</b><br><br>접근 제어(Access Control)가 추가되었습니다.<br>배포하는 순간 호출자(Account 1)가 'owner' 상태 변수에 저장됩니다.<br>Account 2로 계정을 변경한 뒤 <b>withdrawAll</b>을 호출하면 권한 에러(revert)가 발생합니다.` }
+        ];
+
+        let currentTab = 0; let isCompiled = false; let isDeployed = false; let abi = { name: 'Contract' };
+        const SafeStorage = { set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } }, get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } } };
+        let progress = JSON.parse(SafeStorage.get('lab3_progress') || '{"0":false,"1":false,"2":false}');
+
+        function completeCurrentTab() { if (!progress[currentTab]) { progress[currentTab] = true; SafeStorage.set('lab3_progress', JSON.stringify(progress)); showToast(`탭 ${currentTab + 1} 실습 완료!`, 'success'); updateProgressUI(); } }
+        function updateProgressUI() { document.querySelectorAll('.tab-btn').forEach((btn, i) => { if (progress[i]) btn.classList.add('completed'); else btn.classList.remove('completed'); }); }
+
+        function renderAccounts() {
+            const sel = document.getElementById('account-select');
+            if (sel.options.length === 0) sel.innerHTML = BlockchainEngine.accounts.map((acc, idx) => `<option value="${idx}">${acc.address.substring(0, 6)}...${acc.address.substring(38)} (${acc.label})</option>`).join('');
+            const currentAcc = BlockchainEngine.accounts[sel.value];
+            document.getElementById('account-info-container').innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:var(--neon-cyan);">잔액</span><span style="color:var(--text-main); font-size:0.9rem;">${currentAcc.balance.toFixed(4)} ETH</span></div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:var(--neon-cyan);">msg.sender</span><span style="color:var(--text-muted); font-size:0.85rem;">${currentAcc.address.substring(0, 8)}...${currentAcc.address.substring(38)}</span></div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; padding-top:6px; border-top:1px dashed var(--border-muted);"><span style="color:var(--neon-purple);">블록 시간</span><span style="color:var(--text-muted); font-size:0.8rem;">${new Date(BlockchainEngine.timestamp * 1000).toLocaleString()}</span></div>`;
+        }
+
+        function switchTab(idx) {
+            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx)); currentTab = idx;
+            document.getElementById('code-editor').value = SafeStorage.get(`lab3_code_${idx}`) || Labs[idx].code;
+            isCompiled = false; isDeployed = false; BlockchainEngine.resetState();
+            document.getElementById('btn-time-skip').style.display = idx > 0 ? 'block' : 'none';
+            document.getElementById('blockchain-state-container').innerHTML = ''; document.getElementById('guide-container').innerHTML = Labs[idx].guide;
+            document.getElementById('interaction-area').innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:40px;">새로운 탭입니다. 컴파일을 진행하세요.</div>`;
+            syncEditor(); renderAccounts(); updateProgressUI();
+        }
+
+        const editorContent = document.getElementById('editor-scroll-area'); const lineNumbers = document.getElementById('line-numbers'); const codeEditor = document.getElementById('code-editor');
+        editorContent.addEventListener('scroll', () => { lineNumbers.scrollTop = editorContent.scrollTop; });
+        function syncEditor() {
+            const txt = codeEditor.value; let html = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            html = html.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, '<span class="token-comment">$1</span>'); html = html.replace(/(&quot;.*?&quot;|'.*?')/g, '<span class="token-string">$1</span>'); html = html.replace(/\b(\d+)\b/g, '<span class="token-number">$1</span>'); html = html.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, '<span class="token-function">$1</span>'); html = html.replace(/\b(pragma|solidity|contract|constructor|function|returns|public|private|view|pure|payable|if|else|return|require|revert|modifier)\b/g, '<span class="token-keyword">$1</span>'); html = html.replace(/\b(string|int|uint|uint256|int256|bool|address|bytes|mapping)\b/g, '<span class="token-type">$1</span>');
+            document.getElementById('highlight-layer').innerHTML = html + (html.endsWith('\n') ? ' ' : '');
+            lineNumbers.innerHTML = Array(txt.split('\n').length).fill(0).map((_, i) => i + 1).join('<br>');
+            SafeStorage.set(`lab3_code_${currentTab}`, txt); updateCursorPosition();
+        }
+        function updateCursorPosition() { const lines = codeEditor.value.substring(0, codeEditor.selectionStart).split('\n'); document.getElementById('cursor-position').innerText = `줄 ${lines.length}, 열 ${lines[lines.length - 1].length + 1}`; }
+        codeEditor.addEventListener('input', () => { isCompiled = false; syncEditor(); }); codeEditor.addEventListener('click', updateCursorPosition); codeEditor.addEventListener('keyup', updateCursorPosition);
+        codeEditor.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); const s = codeEditor.selectionStart, end = codeEditor.selectionEnd; codeEditor.value = codeEditor.value.substring(0, s) + "    " + codeEditor.value.substring(end); codeEditor.selectionStart = codeEditor.selectionEnd = s + 4; syncEditor(); } });
+        function copyCode() { navigator.clipboard.writeText(codeEditor.value).then(() => { showToast('코드가 복사되었습니다!', 'success'); logConsole('코드 복사 완료', 'success'); }); }
+        function resetCode() { if (confirm('작성 내역이 삭제됩니다. 초기화하시겠습니까?')) { codeEditor.value = Labs[currentTab].code; syncEditor(); showToast('초기화 완료', 'info'); } }
+
+        function compileCode() {
+            const code = codeEditor.value.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, ''); if (!code.includes('contract')) return showToast('contract 키워드가 없습니다.', 'error');
+            const cMatch = code.match(/contract\s+([a-zA-Z_]\w*)/); abi.name = cMatch ? cMatch[1] : 'Faucet';
+            isCompiled = true; isDeployed = false; showToast('컴파일 성공!', 'success'); logConsole(`${abi.name} 컴파일 완료`);
+        }
+
+        function deployContract() {
+            if (!isCompiled) return showToast('먼저 컴파일을 해주세요!', 'warning');
+            BlockchainEngine.resetState(); BlockchainEngine.contractAddress = '0x84aca5913d3a3ca1a0e90a43e7e5269f87b597be';
+            const accIdx = document.getElementById('account-select').value; BlockchainEngine.owner = BlockchainEngine.accounts[accIdx].address;
+            const tx = BlockchainEngine.useGas(accIdx, 250000); renderAccounts();
+            logConsole(`컨트랙트 배포 (Owner: ${BlockchainEngine.owner.substring(0, 9)}...)`, 'tx'); logConsole(`Tx Hash: ${tx.hash}`, 'info'); showToast('배포 완료', 'success');
+            isDeployed = true; updateDynamicLayout();
+        }
+
+        function updateDynamicLayout() {
+            document.getElementById('blockchain-state-container').innerHTML = `<div class="status-grid"><div class="status-box"><div class="val" id="ui-block">${BlockchainEngine.blockNumber}</div><div class="label">블록 번호</div></div><div class="status-box"><div class="val" id="ui-tx">${BlockchainEngine.txCount}</div><div class="label">트랜잭션</div></div></div>`;
+            let html = `<div class="contract-module"><div class="contract-header">📦 ${abi.name} <span style="color:var(--text-muted); font-size:0.75rem;">at ${BlockchainEngine.contractAddress}</span></div><div class="contract-body"><div class="dashboard-display"><div class="title">CONTRACT BALANCE</div><div class="value" id="ui-contract-balance">${BlockchainEngine.contractBalance.toFixed(2)}</div><div class="unit">ETH</div></div><div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">■ 상태 변경 함수 (트랜잭션)</div><div class="func-row"><button class="func-btn payable" onclick="handleDeposit()">deposit</button><input type="number" class="func-input" id="val_deposit" placeholder="1.0" value="1.0"></div><div class="func-row"><button class="func-btn transact" onclick="handleWithdraw()">withdraw (0.1 ETH)</button></div>`;
+            if (currentTab === 2) { html += `<div class="func-row" style="margin-top:15px;"><button class="func-btn owner" onclick="handleWithdrawAll()">withdrawAll (Owner 전용)</button></div>`; }
+            html += `</div></div>`; document.getElementById('interaction-area').innerHTML = html; updateRealtimeState();
+        }
+
+        function updateRealtimeState() {
+            const balanceUI = document.getElementById('ui-contract-balance');
+            if (balanceUI) { balanceUI.innerText = BlockchainEngine.contractBalance.toFixed(2); balanceUI.style.animation = 'none'; setTimeout(() => { balanceUI.style.animation = 'highlightBlink 0.5s ease-out'; }, 10); }
+            if (document.getElementById('ui-block')) { document.getElementById('ui-block').innerText = BlockchainEngine.blockNumber; document.getElementById('ui-tx').innerText = BlockchainEngine.txCount; }
+            renderAccounts();
+        }
+
+        function timeSkip() { BlockchainEngine.timestamp += 86400; renderAccounts(); showToast("블록 시간이 24시간 증가했습니다.", "info"); logConsole("⏩ 시간 조작: 24시간이 경과했습니다.", "var(--neon-purple)"); }
+
+        function handleDeposit() {
+            const accIdx = document.getElementById('account-select').value; const amt = parseFloat(document.getElementById('val_deposit').value) || 0;
+            if (BlockchainEngine.accounts[accIdx].balance < amt) { logConsole("❌ revert: 지갑 잔액 부족", "error"); return showToast("지갑에 ETH가 부족합니다.", "error"); }
+            BlockchainEngine.useGas(accIdx, 21000); BlockchainEngine.accounts[accIdx].balance -= amt; BlockchainEngine.contractBalance += amt;
+            logConsole(`📥 deposit 호출: ${amt} ETH 입금 성공`, "success"); updateRealtimeState(); completeCurrentTab();
+        }
+
+        function handleWithdraw() {
+            const accIdx = document.getElementById('account-select').value; const sender = BlockchainEngine.accounts[accIdx].address;
+            BlockchainEngine.useGas(accIdx, 30000);
+            if (BlockchainEngine.contractBalance < 0.1) { logConsole("❌ revert: Not enough funds", "error"); return showToast("컨트랙트에 잔액이 없습니다.", "error"); }
+            if (currentTab > 0) { const lastTime = BlockchainEngine.lastWithdrawalTime[sender] || 0; if (BlockchainEngine.timestamp < lastTime + 86400) { logConsole("❌ revert: Wait 24 hours", "error"); return showToast("쿨타임 24시간을 기다려야 합니다.", "warning"); } }
+            BlockchainEngine.contractBalance -= 0.1; BlockchainEngine.accounts[accIdx].balance += 0.1; BlockchainEngine.lastWithdrawalTime[sender] = BlockchainEngine.timestamp;
+            logConsole(`💸 withdraw 호출: 0.1 ETH 출금 완료`, "success"); updateRealtimeState(); completeCurrentTab();
+        }
+
+        function handleWithdrawAll() {
+            const accIdx = document.getElementById('account-select').value; const sender = BlockchainEngine.accounts[accIdx].address;
+            BlockchainEngine.useGas(accIdx, 45000);
+            if (sender !== BlockchainEngine.owner) { logConsole("❌ revert: Only owner", "error"); return showToast("권한 오류: Owner 계정이 아닙니다.", "error"); }
+            const amt = BlockchainEngine.contractBalance; BlockchainEngine.contractBalance = 0; BlockchainEngine.accounts[accIdx].balance += amt;
+            logConsole(`👑 withdrawAll 호출: ${amt} ETH 전액 회수 성공`, "var(--neon-purple)"); updateRealtimeState(); completeCurrentTab();
+        }
+
+        window.addEventListener('load', () => { updateProgressUI(); switchTab(0); });
+        function toggleModal() { const m = document.getElementById('shortcut-modal'); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { const modal = document.getElementById('shortcut-modal'); if (modal.style.display === 'flex') modal.style.display = 'none'; else window.location.href = 'index.html'; }
+            if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); compileCode(); }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) { e.preventDefault(); deployContract(); }
+            if (e.ctrlKey && e.key === '/') { e.preventDefault(); toggleModal(); }
+            if (e.ctrlKey && e.key === '`') { e.preventDefault(); const footer = document.getElementById('footer-panel'); footer.classList.toggle('minimized'); showToast(footer.classList.contains('minimized') ? '콘솔 숨김' : '콘솔 열림', 'info'); }
+        });
+    </script>
+</body>
+
+</html>
