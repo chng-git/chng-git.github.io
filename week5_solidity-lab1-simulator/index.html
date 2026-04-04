@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solidity Lab Simulator | Lab 1</title>
+    <style>
+        /* --- 1. 테마 & 애니메이션 --- */
+        :root {
+            --bg-deep: #0a0e27;
+            --bg-surface: #111633;
+            --bg-elevated: #1a1f4a;
+            --neon-cyan: #00d4ff;
+            --neon-purple: #7c3aed;
+            --neon-green: #10b981;
+            --neon-orange: #f59e0b;
+            --neon-red: #ef4444;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-muted: #2a2f5a;
+            --font-code: 'Consolas', 'Fira Code', monospace;
+            --font-ui: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            --panel-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes miningPulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(0.95);
+                box-shadow: 0 0 30px var(--neon-cyan);
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes highlightBlink {
+            0% {
+                background-color: rgba(16, 185, 129, 0.5);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        /* --- 2. 런처 --- */
+        #launcher {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-deep) 100%);
+        }
+
+        .lab-card {
+            background-color: var(--bg-surface);
+            border: 2px solid var(--neon-purple);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 340px;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+            animation: slideUp 0.6s ease-out forwards;
+            z-index: 2;
+        }
+
+        .lab-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .lab-card.mining {
+            pointer-events: none;
+            animation: miningPulse 0.6s ease-out forwards;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            height: 8px;
+            margin-top: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border-muted);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* --- 3. 메인 레이아웃 --- */
+        #lab-container {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        header {
+            height: 45px;
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        main {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr;
+            gap: 15px;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        .panel {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--panel-shadow);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background-color: var(--bg-elevated);
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border-muted);
+        }
+
+        .panel-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* --- 4. 에디터 --- */
+        .editor-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-muted);
+            background-color: var(--bg-elevated);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 12px 15px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-right: 1px solid var(--border-muted);
+            font-family: var(--font-ui);
+        }
+
+        .tab-btn.active {
+            color: var(--neon-cyan);
+            background-color: var(--bg-surface);
+            font-weight: bold;
+            border-bottom: 2px solid var(--neon-cyan);
+        }
+
+        .tab-btn .check {
+            display: none;
+            color: var(--neon-green);
+            margin-left: 5px;
+        }
+
+        .tab-btn.completed .check {
+            display: inline;
+        }
+
+        .editor-wrapper {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            background-color: rgba(10, 14, 39, 0.8);
+            overflow: hidden;
+            font-family: var(--font-code);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        #line-numbers {
+            padding: 15px 10px;
+            background-color: var(--bg-elevated);
+            color: var(--text-muted);
+            text-align: right;
+            width: 40px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-muted);
+            overflow: hidden;
+        }
+
+        .editor-content {
+            position: relative;
+            flex-grow: 1;
+            overflow: auto;
+        }
+
+        #highlight-layer {
+            margin: 0;
+            padding: 15px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: max-content;
+            min-width: 100%;
+            pointer-events: none;
+            white-space: pre;
+            color: var(--text-main);
+        }
+
+        textarea#code-editor {
+            margin: 0;
+            padding: 15px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            color: transparent;
+            caret-color: var(--neon-cyan);
+            border: none;
+            resize: none;
+            outline: none;
+            white-space: pre;
+            font-family: var(--font-code);
+            font-size: 14px;
+            line-height: 1.6;
+            tab-size: 2;
+        }
+
+        .token-keyword {
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+
+        .token-type {
+            color: var(--neon-purple);
+        }
+
+        .token-string {
+            color: var(--neon-green);
+        }
+
+        .token-number {
+            color: var(--neon-orange);
+        }
+
+        .token-comment {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .token-function {
+            color: #60a5fa;
+        }
+
+        .editor-footer {
+            background-color: var(--bg-elevated);
+            padding: 8px 15px;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-muted);
+            color: var(--text-muted);
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: 1px solid var(--border-muted);
+            color: var(--text-muted);
+            border-radius: 4px;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        /* --- 5. UI 요소 & 컴포넌트 --- */
+        .btn {
+            background: transparent;
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .btn.compile {
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .btn.compile:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .btn.deploy {
+            border: 1px solid var(--neon-orange);
+            color: var(--neon-orange);
+        }
+
+        .btn.deploy:hover {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-muted);
+        }
+
+        .status-box {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-muted);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .status-box .val {
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: var(--font-code);
+        }
+
+        .status-box .label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+
+        .contract-module {
+            border: 1px solid var(--border-muted);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .contract-header {
+            background: var(--bg-elevated);
+            padding: 8px 10px;
+            font-size: 0.85rem;
+            font-family: var(--font-code);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-muted);
+        }
+
+        .contract-body {
+            padding: 10px;
+            background: var(--bg-surface);
+        }
+
+        .func-btn {
+            background: var(--bg-deep);
+            border-radius: 6px;
+            padding: 8px;
+            width: auto;
+            text-align: left;
+            cursor: pointer;
+            font-family: var(--font-code);
+            border: 1px solid var(--border-muted);
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .func-btn.view {
+            border-left: 4px solid var(--neon-green);
+            color: var(--text-main);
+        }
+
+        .func-btn.view:hover {
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .func-btn.transact {
+            border-left: 4px solid var(--neon-orange);
+            color: var(--text-main);
+        }
+
+        .func-btn.transact:hover {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .func-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .func-input {
+            flex-grow: 1;
+            padding: 7px;
+            background: var(--bg-deep);
+            color: white;
+            border: 1px solid var(--border-muted);
+            border-radius: 4px;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+        }
+
+        .state-var-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: var(--bg-deep);
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            border: 1px solid var(--border-muted);
+        }
+
+        .state-var-row.updated {
+            animation: highlightBlink 1s ease-out;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-right: 8px;
+        }
+
+        .badge.private {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
+        }
+
+        .badge.public {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        .challenge-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.8rem;
+        }
+
+        .challenge-table th,
+        .challenge-table td {
+            border: 1px solid var(--border-muted);
+            padding: 5px;
+            text-align: center;
+        }
+
+        .challenge-table th {
+            background: var(--bg-elevated);
+            color: var(--neon-cyan);
+        }
+
+        .hint-btn {
+            background: var(--bg-elevated);
+            border: 1px dashed var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            width: 100%;
+            transition: 0.2s;
+        }
+
+        .hint-btn:hover {
+            background: var(--neon-purple);
+            color: white;
+        }
+
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--bg-elevated);
+            border-left: 4px solid;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 0.9rem;
+            animation: slideInRight 0.3s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.success {
+            border-color: var(--neon-green);
+        }
+
+        .toast.error {
+            border-color: var(--neon-red);
+        }
+
+        .toast.info {
+            border-color: var(--neon-cyan);
+        }
+
+        .toast.warning {
+            border-color: var(--neon-orange);
+        }
+
+        footer {
+            height: 160px;
+            background-color: var(--bg-deep);
+            border-top: 1px solid var(--border-muted);
+            display: flex;
+            flex-direction: column;
+            transition: height 0.3s;
+        }
+
+        footer.minimized {
+            height: 35px;
+        }
+
+        #console {
+            flex-grow: 1;
+            font-family: var(--font-code);
+            padding: 10px 20px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        #shortcut-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 25px;
+            width: 450px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        kbd {
+            background: var(--bg-elevated);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-code);
+            color: var(--neon-orange);
+            border: 1px solid var(--border-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="shortcut-modal" onclick="toggleModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-top: 0; color: var(--neon-cyan);">⌨️ 키보드 단축키 도움말</h3>
+            <ul style="list-style: none; padding: 0; margin: 0; color: var(--text-main); font-size: 0.9rem;">
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>Lab 1 이동</span> <kbd>1</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>런처로 복귀</span> <kbd>Escape</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>현재 Lab 컴파일</span> <kbd>Ctrl</kbd> + <kbd>Enter</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>현재 Lab 배포</span> <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>단축키 도움말 모달</span> <kbd>Ctrl</kbd> + <kbd>/</kbd></li>
+                <li
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--border-muted); padding-bottom: 5px;">
+                    <span>콘솔 토글</span> <kbd>Ctrl</kbd> + <kbd>`</kbd></li>
+            </ul>
+            <button class="btn" style="margin-top:20px; margin-bottom:0; border-color:var(--border-muted);"
+                onclick="toggleModal()">닫기</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <div id="launcher">
+        <div
+            style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: -15px; z-index: 1; text-shadow: 0 0 10px rgba(0,212,255,0.5);">
+            🔗</div>
+
+        <div class="lab-card" id="lab1-card" onclick="launchLab()">
+            <h2 style="margin:0 0 15px 0; color:var(--neon-cyan);">Lab 1: Hello World</h2>
+
+            <div
+                style="font-size: 0.8rem; color: var(--text-main); margin-bottom: 15px; display: flex; justify-content: center; gap: 15px;">
+                <span
+                    style="background: var(--bg-elevated); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-muted);">난이도:
+                    <span style="color:var(--neon-orange);">기초 ★☆☆</span></span>
+                <span
+                    style="background: var(--bg-elevated); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-muted);">소요시간:
+                    <span style="color:var(--neon-green);">~15분</span></span>
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
+                <span
+                    style="background: rgba(0, 212, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-family: var(--font-code);">string</span>
+                <span
+                    style="background: rgba(124, 58, 237, 0.1); border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-family: var(--font-code);">public</span>
+                <span
+                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--neon-green); color: var(--neon-green); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-family: var(--font-code);">view</span>
+                <span
+                    style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--neon-orange); color: var(--neon-orange); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-family: var(--font-code);">int</span>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="launcher-progress"></div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--neon-purple); margin-top: 8px; margin-bottom: 0;"
+                id="launcher-progress-txt">0/3 Labs 완료</p>
+            <button class="btn" onclick="resetProgress(event)"
+                style="margin-top:15px; font-size:0.75rem; padding:6px; border-color:var(--border-muted);">진행률
+                초기화</button>
+        </div>
+        <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted);">단축키 <kbd>Ctrl</kbd> + <kbd>/</kbd> 를
+            눌러 도움말 보기</div>
+    </div>
+
+    <div id="lab-container">
+        <header>
+            <div style="color:var(--neon-cyan); font-weight:bold;">Lab 1 Workspace</div>
+            <button class="btn" style="width:auto; margin:0; padding:5px 15px;" onclick="returnToLauncher()">Esc 런처
+                복귀</button>
+        </header>
+
+        <main>
+            <div class="panel">
+                <div class="editor-tabs">
+                    <button class="tab-btn active" onclick="switchTab(0)" id="tab-0">탭1: 기본<span
+                            class="check">✔</span></button>
+                    <button class="tab-btn" onclick="switchTab(1)" id="tab-1">탭2: 확장<span
+                            class="check">✔</span></button>
+                    <button class="tab-btn" onclick="switchTab(2)" id="tab-2">탭3: HelloNumber<span
+                            class="check">✔</span></button>
+                </div>
+                <div class="editor-wrapper">
+                    <div id="line-numbers">1</div>
+                    <div class="editor-content" id="editor-scroll-area">
+                        <pre id="highlight-layer"></pre>
+                        <textarea id="code-editor" spellcheck="false" wrap="off"></textarea>
+                    </div>
+                </div>
+                <div class="editor-footer">
+                    <span id="cursor-position">줄 1, 열 1</span>
+                    <div style="display:flex; gap:10px;">
+                        <button class="tool-btn" onclick="copyCode()">복사</button>
+                        <button class="tool-btn" onclick="resetCode()">초기화</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">제어 & 가이드</div>
+                <div class="panel-content" id="center-panel-content">
+                    <div>
+                        <select class="btn" id="account-select" onchange="renderAccounts()"
+                            style="background:var(--bg-deep); border:1px solid var(--border-muted); text-align:left; margin-bottom: 5px;"></select>
+                        <div id="account-info-container"
+                            style="font-family:var(--font-code); font-size:0.8rem; margin-bottom:15px; display:flex; flex-direction:column; gap:8px;">
+                        </div>
+                    </div>
+
+                    <button class="btn compile" onclick="compileCode()" title="단축키: Ctrl + Enter">🔨 1. 컴파일</button>
+                    <button class="btn deploy" onclick="deployContract()" title="단축키: Ctrl + Shift + D">🚀 2.
+                        배포</button>
+
+                    <div id="blockchain-state-container"></div>
+
+                    <div id="guide-container"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">배포된 컨트랙트</div>
+                <div class="panel-content" id="interaction-area">
+                    <div style="text-align:center; color:var(--text-muted); margin-top:40px;">새로운 탭입니다. 컴파일을 진행하세요.
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="footer-panel">
+            <div
+                style="padding: 5px 20px; background: var(--bg-elevated); border-bottom: 1px solid var(--border-muted); font-size: 0.8rem; display:flex; justify-content:space-between;">
+                <span>터미널 로깅 (Ctrl+` 토글)</span>
+                <span style="color:var(--text-muted); cursor:pointer;"
+                    onclick="document.getElementById('console').innerHTML=''">지우기</span>
+            </div>
+            <div id="console"></div>
+        </footer>
+    </div>
+
+    <script>
+        // --- 0. 배경 캔버스 로직 ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationFrameId;
+        let isTabActive = true;
+
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2;
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 212, 255, ${this.alpha})`;
+                ctx.fill();
+            }
+        }
+
+        for(let i=0; i<70; i++) particles.push(new Particle());
+
+        function animate() {
+            if (!isTabActive) return; // 비활성 시 루프 차단 (성능 최적화)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            animationFrameId = requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 탭 활성/비활성 감지 최적화
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                isTabActive = false;
+                cancelAnimationFrame(animationFrameId);
+            } else {
+                isTabActive = true;
+                animate();
+            }
+        });
+        // --- 1. 유틸리티 & 로깅 ---
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div'); toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+            container.appendChild(toast); setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        function logConsole(msg, type = 'info') {
+            const c = document.getElementById('console');
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'tx' ? '🔶' : 'ℹ️';
+            c.innerHTML += `<div style="margin-bottom:4px; color: ${type === 'error' ? 'var(--neon-red)' : type === 'tx' ? 'var(--neon-orange)' : type === 'success' ? 'var(--neon-green)' : 'var(--text-main)'}"><span style="color:var(--text-muted)">[${new Date().toLocaleTimeString()}]</span> ${icon} ${msg}</div>`;
+            c.scrollTop = c.scrollHeight;
+        }
+
+        // --- 2. 가상 블록체인 엔진 (State Machine) ---
+        const BlockchainEngine = {
+            blockNumber: 1, timestamp: Math.floor(Date.now() / 1000), gasPrice: 20, chainId: 1337,
+            accounts: [
+                { address: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4', balance: 100, label: 'Account 1', nonce: 0 },
+                { address: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2', balance: 100, label: 'Account 2', nonce: 0 },
+                { address: '0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db', balance: 100, label: 'Account 3', nonce: 0 },
+                { address: '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB', balance: 100, label: 'Account 4', nonce: 0 },
+                { address: '0x617F2E2fD72FD9D5503197092aC168c91465E7f2', balance: 100, label: 'Account 5', nonce: 0 }
+            ],
+            storage: {}, contractAddress: '', txCount: 0,
+            useGas: function (accountIndex, gasLimit) {
+                const ethCost = (gasLimit * this.gasPrice) / 1e9;
+                this.accounts[accountIndex].balance -= ethCost;
+                this.accounts[accountIndex].nonce++; this.txCount++; this.blockNumber++;
+                this.timestamp = Math.floor(Date.now() / 1000);
+                const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                return { cost: ethCost.toFixed(5), hash: txHash };
+            },
+            resetState: function () { this.storage = {}; this.contractAddress = ''; }
+        };
+
+        // --- 3. 앱 상태 관리 & 로컬 스토리지 ---
+        const Labs = [
+            { code: "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.26;\n\ncontract HelloWorld {\n    string public greet = \"Hello World\";\n}", guide: `<h4 style="color:var(--neon-cyan);margin:0 0 10px 0;">탭 1 가이드</h4><ol style="padding-left:20px; font-size:0.85rem; color:var(--text-main);"><li>코드를 확인하세요. <code>string public</code></li><li><b>컴파일</b> 버튼 클릭</li><li><b>배포</b> 버튼 클릭</li><li>우측에서 <b>greet</b> 버튼 클릭!</li></ol>` },
+            { code: "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.26;\n\ncontract HelloWorld {\n    string private _greeting = \"Hello, World!\";\n\n    function greet() public view returns (string memory) {\n        return _greeting;\n    }\n\n    function setGreeting(string memory newGreeting) public {\n        _greeting = newGreeting;\n    }\n}", guide: `<h4 style="color:var(--neon-cyan);margin:0 0 10px 0;">탭 2 가이드</h4><ol style="padding-left:20px; font-size:0.85rem; color:var(--text-main);"><li>private 변수 확인</li><li>컴파일 → 배포</li><li><code>greet()</code> 호출 (무료)</li><li><code>setGreeting</code> 실행 (가스 소모)</li></ol>` },
+            { code: "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.26;\n\ncontract HelloNumber {\n    int public number = 10;\n}", guide: `<h4 style="color:var(--neon-cyan);margin:0 0 10px 0;">도전과제 (HelloNumber)</h4><table class="challenge-table"><tr><th>특성</th><th>public</th><th>private</th></tr><tr><td>외부 접근</td><td>가능</td><td style="color:var(--neon-red);">불가</td></tr><tr><td>자동 getter</td><td>자동 생성</td><td style="color:var(--neon-red);">직접 작성</td></tr><tr><td>컨트랙트 내부</td><td>접근 가능</td><td>접근 가능</td></tr><tr><td>상속 컨트랙트</td><td>접근 가능</td><td style="color:var(--neon-red);">접근 불가</td></tr><tr><td>사용 시나리오</td><td style="color:var(--neon-cyan);">공개 데이터</td><td style="color:var(--neon-purple);">캡슐화/보안</td></tr></table><div style="font-size:0.8rem; margin: 15px 0 5px 0;"><b>도전과제 내용</b></div><ul style="padding-left: 20px; margin-top: 0; font-size: 0.8rem; color: var(--text-muted);"><li><code style="color:var(--neon-cyan);">int public number</code>를 <code style="color:var(--neon-purple);">int private _number</code>로 변경</li><li><code style="color:var(--neon-green);">getNumber()</code>: public view로 반환</li><li><code style="color:var(--neon-orange);">setNumber(int)</code>: public 함수로 변경</li></ul><button class="hint-btn" onclick="applyHintCode()">💡 정답 덮어쓰기</button>` }
+        ];
+
+        let currentTab = 0; let isCompiled = false; let isDeployed = false; let abi = { name: 'Contract', vars: [], funcs: [] };
+
+        const SafeStorage = {
+            set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } },
+            get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }
+        };
+        let progress = JSON.parse(SafeStorage.get('lab1_progress') || '{"0":false,"1":false,"2":false}');
+
+        function completeCurrentTab() {
+            if (!progress[currentTab]) {
+                progress[currentTab] = true; SafeStorage.set('lab1_progress', JSON.stringify(progress));
+                showToast(`탭 ${currentTab + 1} 실습 완료!`, 'success'); updateProgressUI();
+            }
+        }
+        function updateProgressUI() {
+            let completed = Object.values(progress).filter(Boolean).length; let percent = Math.floor((completed / 3) * 100);
+            const bar = document.getElementById('launcher-progress');
+            if (bar) { bar.style.width = `${percent}%`; document.getElementById('launcher-progress-txt').innerText = `${completed}/3 Labs 완료`; }
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => { if (progress[i]) btn.classList.add('completed'); else btn.classList.remove('completed'); });
+        }
+        function resetProgress(e) {
+            e.stopPropagation();
+            if (confirm('진행률과 저장된 코드를 모두 초기화할까요?')) {
+                progress = { 0: false, 1: false, 2: false }; SafeStorage.set('lab1_progress', JSON.stringify(progress));
+                [0, 1, 2].forEach(i => SafeStorage.set(`lab1_code_${i}`, ''));
+                updateProgressUI(); showToast('초기화 되었습니다.', 'warning');
+            }
+        }
+
+        // --- 4. 계정 렌더링 & 탭 스위치 ---
+        // 계정 렌더링 및 UI 컨트롤
+        function renderAccounts() {
+            const sel = document.getElementById('account-select');
+            if (sel.options.length === 0) {
+                sel.innerHTML = BlockchainEngine.accounts.map((acc, idx) =>
+                    `<option value="${idx}">${acc.address.substring(0, 6)}...${acc.address.substring(38)} (${acc.label})</option>`
+                ).join('');
+            }
+            const currentAcc = BlockchainEngine.accounts[sel.value];
+
+            const infoContainer = document.getElementById('account-info-container');
+            if (infoContainer) {
+                infoContainer.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--neon-cyan);">잔액</span>
+                <span style="color:var(--text-main); font-size:0.9rem;">${currentAcc.balance.toFixed(4)} ETH</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--neon-cyan);">msg.sender</span>
+                <span style="color:var(--text-muted); font-size:0.85rem;">${currentAcc.address.substring(0, 8)}...${currentAcc.address.substring(36)}</span>
+            </div>
+        `;
+            }
+        }
+
+        function switchTab(idx) {
+            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+            currentTab = idx;
+
+            // 저장된 코드 불러오기 (자동 저장 연동)
+            const savedCode = SafeStorage.get(`lab1_code_${idx}`);
+            document.getElementById('code-editor').value = savedCode || Labs[idx].code;
+
+            isCompiled = false; isDeployed = false; BlockchainEngine.resetState();
+            document.getElementById('blockchain-state-container').innerHTML = '';
+            document.getElementById('guide-container').innerHTML = Labs[idx].guide;
+            document.getElementById('interaction-area').innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:40px;">새로운 탭입니다. 컴파일을 진행하세요.</div>`;
+            syncEditor(); renderAccounts(); updateProgressUI();
+        }
+
+        // --- 5. 에디터 엔진 (동기 스크롤, 자동 저장, 복사/초기화) ---
+        const editorContent = document.getElementById('editor-scroll-area');
+        const lineNumbers = document.getElementById('line-numbers');
+        const codeEditor = document.getElementById('code-editor');
+
+        // 줄 번호 동기 스크롤
+        editorContent.addEventListener('scroll', () => { lineNumbers.scrollTop = editorContent.scrollTop; });
+
+        function syncEditor() {
+            const txt = codeEditor.value;
+            let html = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            html = html.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, '<span class="token-comment">$1</span>');
+            html = html.replace(/(&quot;.*?&quot;|'.*?')/g, '<span class="token-string">$1</span>');
+            html = html.replace(/\b(\d+)\b/g, '<span class="token-number">$1</span>');
+            html = html.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, '<span class="token-function">$1</span>');
+            html = html.replace(/\b(pragma|solidity|contract|function|returns|public|private|view|pure|if|else|return|require|revert)\b/g, '<span class="token-keyword">$1</span>');
+            html = html.replace(/\b(string|int|uint|uint256|int256|bool|address|bytes)\b/g, '<span class="token-type">$1</span>');
+            document.getElementById('highlight-layer').innerHTML = html + (html.endsWith('\n') ? ' ' : '');
+
+            const linesCount = txt.split('\n').length;
+            lineNumbers.innerHTML = Array(linesCount).fill(0).map((_, i) => i + 1).join('<br>');
+
+            SafeStorage.set(`lab1_code_${currentTab}`, txt); // 자동 저장
+            updateCursorPosition();
+        }
+
+        function updateCursorPosition() {
+            const txt = codeEditor.value;
+            const upToCursor = txt.substring(0, codeEditor.selectionStart);
+            const lines = upToCursor.split('\n');
+            document.getElementById('cursor-position').innerText = `줄 ${lines.length}, 열 ${lines[lines.length - 1].length + 1}`;
+        }
+
+        // 에디터 이벤트 바인딩
+        codeEditor.addEventListener('input', () => { isCompiled = false; syncEditor(); });
+        codeEditor.addEventListener('click', updateCursorPosition);
+        codeEditor.addEventListener('keyup', updateCursorPosition);
+        codeEditor.addEventListener('keydown', e => {
+            // Tab 키 2칸 들여쓰기 구현
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const s = codeEditor.selectionStart, end = codeEditor.selectionEnd;
+                codeEditor.value = codeEditor.value.substring(0, s) + "  " + codeEditor.value.substring(end);
+                codeEditor.selectionStart = codeEditor.selectionEnd = s + 2;
+                syncEditor();
+            }
+        });
+
+        function copyCode() {
+            navigator.clipboard.writeText(codeEditor.value).then(() => { showToast('코드가 복사되었습니다!', 'success'); logConsole('코드 복사 완료', 'success'); })
+                .catch(err => { showToast('복사 실패: 권한을 확인해주세요.', 'error'); });
+        }
+
+        function resetCode() {
+            if (confirm('코드 작성 내역이 삭제됩니다. 초기화하시겠습니까?')) { codeEditor.value = Labs[currentTab].code; syncEditor(); showToast('초기화 완료', 'info'); logConsole('코드 초기화', 'info'); }
+        }
+
+        function applyHintCode() {
+            document.getElementById('code-editor').value = "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.26;\n\ncontract HelloNumber {\n    int private _number = 10;\n\n    function getNumber() public view returns (int) {\n        return _number;\n    }\n\n    function setNumber(int newNumber) public {\n        _number = newNumber;\n    }\n}";
+            syncEditor(); showToast('정답 코드가 적용되었습니다. 컴파일을 다시 진행하세요.', 'info');
+            isCompiled = false;
+        }
+
+        // --- 6. 파서 & 배포 & 함수 실행 (가상 컴파일러) ---
+        function compileCode() {
+            const code = codeEditor.value.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, '');
+            if (!code.includes('contract')) return showToast('contract 키워드가 없습니다.', 'error');
+
+            abi = { name: 'Contract', vars: [], funcs: [] };
+            const cMatch = code.match(/contract\s+([a-zA-Z_]\w*)/); if (cMatch) abi.name = cMatch[1];
+
+            const vRex = /(string|int|uint)\s+(public|private)\s+([a-zA-Z_]\w*)\s*(?:=\s*(["'].*?["']|\d+))?;/g;
+            let m; BlockchainEngine.storage = {};
+            while ((m = vRex.exec(code))) {
+                let val = m[4] ? m[4].replace(/['"]/g, '') : (m[1] === 'string' ? '' : '0');
+                abi.vars.push({ type: m[1], vis: m[2], name: m[3], initVal: val });
+                BlockchainEngine.storage[m[3]] = val;
+            }
+            const fRex = /function\s+([a-zA-Z_]\w*)\s*\((.*?)\)\s*(public|private)\s*(view|pure)?/g;
+            while ((m = fRex.exec(code))) { abi.funcs.push({ name: m[1], params: m[2], isView: !!m[4] }); }
+
+            isCompiled = true; isDeployed = false; showToast('컴파일 성공!', 'success'); logConsole(`${abi.name} 컴파일 완료`);
+        }
+
+        function deployContract() {
+            if (!isCompiled) return showToast('먼저 컴파일을 해주세요!', 'warning');
+            BlockchainEngine.contractAddress = '0x622724426e96e4fde3dd7ce7294c68cbf5b06015';
+            const accIdx = document.getElementById('account-select').value;
+            const tx = BlockchainEngine.useGas(accIdx, 200000);
+            renderAccounts(); logConsole(`배포 트랜잭션 전송 (-${tx.cost} ETH)`, 'tx'); logConsole(`Tx Hash: ${tx.hash}`, 'info'); showToast('배포 완료', 'success');
+            isDeployed = true; updateDynamicLayout();
+        }
+
+        function updateDynamicLayout() {
+            document.getElementById('blockchain-state-container').innerHTML = `
+                <div class="status-grid">
+                    <div class="status-box"><div class="val" id="ui-block">${BlockchainEngine.blockNumber}</div><div class="label">블록 번호</div></div>
+                    <div class="status-box"><div class="val" id="ui-tx">${BlockchainEngine.txCount}</div><div class="label">트랜잭션</div></div>
+                </div>
+            `;
+            let rightHTML = `<div class="contract-module"><div class="contract-header">📦 ${abi.name} <span style="color:var(--text-muted); font-size:0.75rem;">at ${BlockchainEngine.contractAddress}</span></div><div class="contract-body">`;
+            let viewFuncs = abi.funcs.filter(f => f.isView);
+            if (viewFuncs.length > 0 || abi.vars.some(v => v.vis === 'public')) {
+                rightHTML += `<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">■ View / Pure 함수 (읽기 전용)</div>`;
+                abi.vars.filter(v => v.vis === 'public').forEach(v => { rightHTML += `<div class="func-row"><button class="func-btn view" onclick="callMockView('${v.name}', '${v.name}')">${v.name}</button></div>`; });
+                viewFuncs.forEach(f => { rightHTML += `<div class="func-row"><button class="func-btn view" onclick="callMockView('${f.name}')">${f.name}</button></div>`; });
+            }
+            let txFuncs = abi.funcs.filter(f => !f.isView);
+            if (txFuncs.length > 0) {
+                rightHTML += `<div style="font-size:0.75rem; color:var(--text-muted); margin:15px 0 10px 0;">■ 상태 변경 함수 (트랜잭션)</div>`;
+                txFuncs.forEach(f => { rightHTML += `<div class="func-row"><button class="func-btn transact" onclick="callMockTx('${f.name}')">${f.name}</button>${f.params ? `<input type="text" class="func-input" id="inp_${f.name}" placeholder="${f.params}">` : ''}</div>`; });
+            }
+            rightHTML += `</div></div>`;
+            if (abi.vars.length > 0) { rightHTML += `<div class="contract-module"><div class="contract-header">🔍 컨트랙트 상태 변수 (실시간)</div><div class="contract-body" id="realtime-state-container"></div></div>`; }
+            document.getElementById('interaction-area').innerHTML = rightHTML;
+            updateRealtimeState();
+        }
+
+        function updateRealtimeState(updatedVarName = null) {
+            const container = document.getElementById('realtime-state-container');
+            if (container) {
+                let html = '';
+                abi.vars.forEach(v => {
+                    const val = BlockchainEngine.storage[v.name] !== undefined ? BlockchainEngine.storage[v.name] : 'null';
+                    const isUpdated = v.name === updatedVarName ? 'updated' : '';
+                    html += `<div class="state-var-row ${isUpdated}"><div><span class="badge ${v.vis}">${v.vis}</span> <span>${v.name}</span></div><div style="color:var(--neon-cyan);">"${val}"</div></div>`;
+                });
+                container.innerHTML = html;
+            }
+            if (document.getElementById('ui-block')) { document.getElementById('ui-block').innerText = BlockchainEngine.blockNumber; document.getElementById('ui-tx').innerText = BlockchainEngine.txCount; }
+        }
+
+        function callMockView(funcName, targetVarName = null) {
+            let target = targetVarName; if (!target) { const inferred = funcName.replace('get', '').toLowerCase(); target = abi.vars.find(v => v.name.toLowerCase().includes(inferred))?.name || abi.vars[0]?.name; }
+            const val = BlockchainEngine.storage[target]; logConsole(`View 호출: ${funcName}() -> 반환값: ${val}`, 'success'); showToast(`반환값: ${val}`, 'info'); completeCurrentTab();
+        }
+
+        function callMockTx(funcName) {
+            const inp = document.getElementById(`inp_${funcName}`); let newVal = inp ? inp.value : '';
+            if (inp && !newVal) return showToast('파라미터 값을 입력하세요.', 'error');
+            const inferred = funcName.replace('set', '').toLowerCase(); let targetVar = abi.vars.find(v => v.name.toLowerCase().includes(inferred))?.name;
+            if (targetVar) { BlockchainEngine.storage[targetVar] = newVal; }
+            const accIdx = document.getElementById('account-select').value; const tx = BlockchainEngine.useGas(accIdx, 25000); renderAccounts();
+            logConsole(`상태 변경 Tx: ${funcName}(${newVal}) / 소모: -${tx.cost} ETH`, 'tx'); logConsole(`Tx Hash: ${tx.hash}`, 'info'); showToast('트랜잭션 마이닝 완료', 'success');
+            updateRealtimeState(targetVar); completeCurrentTab();
+        }
+
+        // --- 7. 라우팅 및 단축키 ---
+        function launchLab() { document.getElementById('lab1-card').classList.add('mining'); setTimeout(() => { window.location.hash = 'lab1'; document.getElementById('lab1-card').classList.remove('mining'); }, 600); }
+        function returnToLauncher() { window.location.hash = ''; }
+
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#lab1') { document.getElementById('launcher').style.display = 'none'; document.getElementById('lab-container').style.display = 'flex'; switchTab(0); }
+            else { document.getElementById('launcher').style.display = 'flex'; document.getElementById('lab-container').style.display = 'none'; updateProgressUI(); }
+        });
+
+        window.addEventListener('load', () => {
+            updateProgressUI();
+            if (window.location.hash === '#lab1') { document.getElementById('launcher').style.display = 'none'; document.getElementById('lab-container').style.display = 'flex'; switchTab(0); }
+        });
+
+        function toggleModal() { const m = document.getElementById('shortcut-modal'); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
+
+        // 통합 단축키 핸들러
+        document.addEventListener('keydown', e => {
+            // 1: Lab 1 이동 (입력창 밖에서만)
+            if (e.key === '1' && document.activeElement.tagName !== 'TEXTAREA' && window.location.hash !== '#lab1') { e.preventDefault(); launchLab(); }
+
+            // Escape: 모달 닫기 또는 런처로 복귀
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('shortcut-modal');
+                if (modal.style.display === 'flex') modal.style.display = 'none';
+                else returnToLauncher();
+            }
+
+            // Ctrl + Enter: 컴파일
+            if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); compileCode(); }
+
+            // Ctrl + Shift + D: 배포 (브라우저 기본 북마크 단축키 방지 포함)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) { e.preventDefault(); deployContract(); }
+
+            // Ctrl + /: 단축키 모달
+            if (e.ctrlKey && e.key === '/') { e.preventDefault(); toggleModal(); }
+
+            // Ctrl + ` : 콘솔 토글
+            if (e.ctrlKey && e.key === '`') {
+                e.preventDefault();
+                const footer = document.getElementById('footer-panel');
+                footer.classList.toggle('minimized');
+                showToast(footer.classList.contains('minimized') ? '콘솔 숨김' : '콘솔 열림', 'info');
+            }
+        });
+    </script>
+</body>
+
+</html>
