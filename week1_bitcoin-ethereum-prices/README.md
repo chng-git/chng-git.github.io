@@ -1,5 +1,7 @@
 # Week 1 Assignment
 
+[🚀 웹에서 실행하기](https://chng-git.github.io/week1_bitcoin-ethereum-prices)
+
 ## 프로젝트 개요
 - GitHub 계정을 생성하여 정적 웹 페이지를 구축하고, 외부 API를 연동하여 암호화폐(Bitcoin, Ethereum)의 시세를 실시간으로 대시보드에 시각화합니다
 

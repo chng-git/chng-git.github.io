@@ -1,5 +1,7 @@
 # Week 5 Assignment
 
+[🚀 웹에서 실행하기](https://chng-git.github.io/week5_solidity-lab-simulator) 
+
 ## 프로젝트 개요
 
   - 이 프로젝트는 웹 브라우저 상에서 직접 Solidity 코드를 컴파일하고 배포하는 과정을 체험할 수 있도록 만든 **프론트엔드 시뮬레이터**입니다. Remix IDE의 핵심 경험을 모방하여 제작되었습니다.
@@ -76,3 +78,12 @@
 
   * 본 도구는 교육 및 학습용 시뮬레이터로, 실제 메인넷의 가스비 계산 모델이나 블록 생성 딜레이와는 미세한 차이가 있을 수 있습니다.
   * 브라우저 로컬 스토리지에 코드가 임시 저장되지만, 강력한 새로고침이나 캐시 삭제 시 배포된 네트워크 상태는 초기화됩니다.
+
+-----
+## 실습 캡쳐
+[!index](https://github.com/user-attachments/assets/45cd9214-861d-48bf-9a9c-22343f11fec7)
+[!lab2-counter.sol](https://github.com/user-attachments/assets/e866d666-1570-4f8f-bfbb-b067a4673e4f)
+[!lab2-checknumber.sol](https://github.com/user-attachments/assets/63eef033-5f99-42aa-8bc1-95d54e6b6fc7)
+[!lab3-faucet](https://github.com/user-attachments/assets/779a75de-292b-4368-bc10-5bf998f7d020)
+[!lab3-cooltime](https://github.com/user-attachments/assets/3423edee-308a-4cb1-a0ad-f4e736c330de)
+[!lab3-owner](https://github.com/user-attachments/assets/ec9f7133-f69d-43ce-9b87-a1e066262d22)

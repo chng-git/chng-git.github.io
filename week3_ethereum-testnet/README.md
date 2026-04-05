@@ -1,5 +1,7 @@
 # Week 3 Assignment
 
+[🚀 웹에서 실행하기](https://chng-git.github.io/week3_ethereum-testnet)
+
 ## 프로젝트 개요
 - Ethers.js(v6)를 활용하여 이더리움 테스트넷과 네트워크를 통해 상호작용하는 블록체인 실습 과제입니다.
 - 블록체인의 코드를 통해 Nonce, Gas, Signature을 직접 확인합니다.
