@@ -81,9 +81,9 @@
 
 -----
 ## 실습 캡쳐
-[!index](https://github.com/user-attachments/assets/45cd9214-861d-48bf-9a9c-22343f11fec7)
-[!lab2-counter.sol](https://github.com/user-attachments/assets/e866d666-1570-4f8f-bfbb-b067a4673e4f)
-[!lab2-checknumber.sol](https://github.com/user-attachments/assets/63eef033-5f99-42aa-8bc1-95d54e6b6fc7)
-[!lab3-faucet](https://github.com/user-attachments/assets/779a75de-292b-4368-bc10-5bf998f7d020)
-[!lab3-cooltime](https://github.com/user-attachments/assets/3423edee-308a-4cb1-a0ad-f4e736c330de)
-[!lab3-owner](https://github.com/user-attachments/assets/ec9f7133-f69d-43ce-9b87-a1e066262d22)
+![index](https://github.com/user-attachments/assets/45cd9214-861d-48bf-9a9c-22343f11fec7)
+![lab2-counter.sol](https://github.com/user-attachments/assets/e866d666-1570-4f8f-bfbb-b067a4673e4f)
+![lab2-checknumber.sol](https://github.com/user-attachments/assets/63eef033-5f99-42aa-8bc1-95d54e6b6fc7)
+![lab3-faucet](https://github.com/user-attachments/assets/779a75de-292b-4368-bc10-5bf998f7d020)
+![lab3-cooltime](https://github.com/user-attachments/assets/3423edee-308a-4cb1-a0ad-f4e736c330de)
+![lab3-owner](https://github.com/user-attachments/assets/ec9f7133-f69d-43ce-9b87-a1e066262d22)
