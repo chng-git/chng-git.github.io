@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sepolia Faucet 🐾</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* --- 블록체인 네온 다크 테마 --- */
+        :root {
+            --bg-deep: #0a0e27;
+            --bg-surface: #111633;
+            --bg-elevated: #1a1f4a;
+            --neon-cyan: #00d4ff;
+            --neon-purple: #7c3aed;
+            --neon-green: #10b981;
+            --neon-orange: #f59e0b;
+            --border-muted: #2a2f5a;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --font-ui: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            --font-code: 'Consolas', monospace;
+        }
+
+        body {
+            font-family: var(--font-ui);
+            text-align: center;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            padding: 50px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--bg-surface);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-muted);
+            display: inline-block;
+            width: 450px;
+        }
+
+        .pixel-cat {
+            font-family: var(--font-code);
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.2;
+            white-space: pre;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: var(--text-main);
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: var(--border-muted);
+            margin: 25px 0;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+
+        .highlight {
+            color: var(--neon-cyan);
+            font-family: var(--font-code);
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        button:disabled {
+            border-color: var(--border-muted);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #requestBtn {
+            border-color: var(--neon-orange);
+            color: var(--neon-orange);
+            font-size: 1.1rem;
+            padding: 15px 30px;
+            width: 80%;
+        }
+
+        #requestBtn:hover:not(:disabled) {
+            background-color: rgba(245, 158, 11, 0.1);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+        }
+
+        #status {
+            margin-top: 15px;
+            height: 20px;
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            width: 100%;
+            margin-top: 25px;
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="pixel-cat">
+            /\_/\
+            ( o.o )
+            > ^ < </div>
+
+                <h1>Sepolia Faucet 🐾</h1>
+                <button id="connectBtn">지갑 연결하기</button>
+                <p id="accountArea">연결된 주소: <span class="highlight">아직 연결되지 않음</span></p>
+
+                <hr>
+
+                <h3>Faucet 현황</h3>
+                <p>Faucet 잔액: <span id="faucetBalance" class="highlight" style="font-size: 1.2rem;">0.00</span> ETH</p>
+                <p>회당 요청 금액: <span style="color: var(--neon-orange);">0.01 ETH</span></p>
+
+                <button id="requestBtn" disabled>0.01 ETH 받기</button>
+
+                <div id="status"></div>
+
+                <div class="chart-container">
+                    <canvas id="balanceChart" height="150"></canvas>
+                </div>
+        </div>
+
+        <script src="abi.js"></script>
+        <script src="app.js"></script>
+</body>
+
+</html>
