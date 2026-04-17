@@ -7,18 +7,19 @@ def generate_table():
     # 주차 순서대로 정렬 (최신순)
     folders.sort(key=lambda x: int(re.search(r'\d+', x).group() if re.search(r'\d+', x) else 0), reverse=True)
 
-    table = "| 주차 | 과제명 | 소스 코드 (Code) | 실제 실행 (Web) |\n"
+    table = "| 주차 | 과제명 | 소스 코드 (Repository) | 실제 실행 (Live Demo) |\n"
     table += "|:---:|:---|:---:|:---:|\n"
 
     for folder in folders:
         week_num = re.search(r'\d+', folder).group() if re.search(r'\d+', folder) else "?"
+        # 폴더명에서 과제명 추출 및 예쁘게 포맷팅
         title = folder.split('_', 1)[1].replace('-', ' ').title() if '_' in folder else f"Assignment {week_num}"
         
         # index.html 존재 여부 확인
         has_index = os.path.exists(os.path.join(folder, 'index.html'))
-        demo_link = f"[🚀 Launch App](https://chng-git.github.io/{folder})" if has_index else "(No UI)"
+        demo_link = f"[🚀 웹에서 실행하기](https://chng-git.github.io/{folder})" if has_index else "(UI 없음)"
         
-        table += f"| **Week {week_num}** | {title} | [📁 Folder](./{folder}) | {demo_link} |\n"
+        table += f"| **Week {week_num}** | {title} | [📁 소스 보기](./{folder}) | {demo_link} |\n"
     
     return table
 
