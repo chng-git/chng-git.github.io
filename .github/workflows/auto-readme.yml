@@ -1,0 +1,27 @@
+name: Update README Table
+
+on:
+  push:
+    branches: [ main ] # 메인 브랜치에 변화가 생기면 실행
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run Update Script
+        run: python scripts/update_readme.py # 파이썬 스크립트 실행
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: auto update assignment table" || echo "No changes to commit"
+          git push
