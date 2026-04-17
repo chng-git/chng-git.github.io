@@ -13,13 +13,11 @@
 
 ## 📚 Assignment List
 
-| 주차 | 과제명 | 소스 코드 (Repository) | 실제 실행 (Live Demo) |
-|:---:|:---|:---:|:---:|
-| **Week 6** | Faucet 대시보드  | [📁 소스 보기](./week6_sepolia-faucet) | [🚀 웹에서 실행하기](https://chng-git.github.io/week6_sepolia-faucet) |
-| **Week 5** | Solidity Lab 시뮬레이터 | [📁 소스 보기](./week5_solidity-lab-simulator) | [🚀 웹에서 실행하기](https://chng-git.github.io/week5_solidity-lab-simulator) |
-| **Week 3** | Ethereum Testnet 실습 | [📁 소스 보기](./week3_ethereum-testnet) | [🚀 웹에서 실행하기](https://chng-git.github.io/week3_ethereum-testnet) |
-| **Week 2** | Ethereum RPC Practice | [📁 소스 보기](./week2_ethereum-rpc-practice) | (UI 없음) |
-| **Week 1** | 블록체인 기초 과제 | [📁 소스 보기](./week1_bitcoin-ethereum-prices) | [🚀 웹에서 실행하기](https://chng-git.github.io/week1_bitcoin-ethereum-prices) |
+
+
+This table is automatically updated via GitHub Actions.
+<br>
+
 ---
 
 <br>
