@@ -30,13 +30,13 @@
 
 ## 실습 캡쳐
 
-[!01](https://github.com/user-attachments/assets/204ef686-2837-422b-a007-02611e77faea)
-[!02](https://github.com/user-attachments/assets/8672e44e-7d76-45bd-8995-8260d974bb28)
-[!03](https://github.com/user-attachments/assets/0bd2f7f1-a6d8-489b-8682-821c106f015c)
-[!04](https://github.com/user-attachments/assets/1a813c5e-f95e-4e2f-a1b8-fe734e5534ee)
-[!05](https://github.com/user-attachments/assets/3ba8c310-f855-4032-aa18-06d22635a143)
-[!06](https://github.com/user-attachments/assets/f1a90990-b90a-42f6-bcf9-b45488c665c4)
-[!07](https://github.com/user-attachments/assets/9db678e4-0fc1-4e24-aea2-6db70f9c8807)
+![01](https://github.com/user-attachments/assets/204ef686-2837-422b-a007-02611e77faea)
+![02](https://github.com/user-attachments/assets/8672e44e-7d76-45bd-8995-8260d974bb28)
+![03](https://github.com/user-attachments/assets/0bd2f7f1-a6d8-489b-8682-821c106f015c)
+![04](https://github.com/user-attachments/assets/1a813c5e-f95e-4e2f-a1b8-fe734e5534ee)
+![05](https://github.com/user-attachments/assets/3ba8c310-f855-4032-aa18-06d22635a143)
+![06](https://github.com/user-attachments/assets/f1a90990-b90a-42f6-bcf9-b45488c665c4)
+![07](https://github.com/user-attachments/assets/9db678e4-0fc1-4e24-aea2-6db70f9c8807)
 
 
 ---
