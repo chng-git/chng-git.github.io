@@ -4,7 +4,7 @@
 본 주차에는 스마트 컨트랙트 구현에 앞서, 핵심 아키텍처와 비즈니스 로직을 담은 **제안서 발표**를 진행했습니다.
 
 ##  상세 내용
-- **index.html:** 발표 내용 요약 및 제안서 슬라이드 링크를 포함한 대시보드 화면
-- **제안서 링크:** [🔗 발표 자료 보러가기](./presentation.pdf)
+- **index.html:** [🔗 발표 자료 웹으로 보기](https://chng-git.github.io/week12_term-project-proposal/)
+- **presenation.pdf:** [🔗 발표 자료 보러가기](./presentation.pdf)
 
 ※ 본 주차는 컨트랙트 배포 없이 제안서 발표 및 피드백 수렴으로 대체되었습니다.
