@@ -18,6 +18,7 @@ This table is automatically updated via GitHub Actions.
 
 | 주차 | 과제명 | 소스 코드 (Repository) | 실제 실행 (Live Demo) |
 |:---:|:---|:---:|:---:|
+| **Week 12** | Term Project Proposal | [📁 소스 보기](./week12_term-project-proposal) | [🚀 웹에서 실행하기](https://chng-git.github.io/week12_term-project-proposal) |
 | **Week 11** | Smart Contract Hacks | [📁 소스 보기](./week11_smart-contract-hacks) | (UI 없음) |
 | **Week 09** | Stablecoin Payment Dapp | [📁 소스 보기](./week09_stablecoin-payment-dapp) | (UI 없음) |
 | **Week 07** | Staking Smart Contract | [📁 소스 보기](./week07_staking-smart-contract) | (UI 없음) |
