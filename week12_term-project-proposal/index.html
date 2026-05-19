@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 제안서 - 박채원</title>
+    <!-- Google Fonts for professional typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for clean icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* CSS Reset & Variables */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --bg-main: #0B0F17;
+            --bg-card: #131B2E;
+            --bg-card-hover: #1A243D;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --accent-cyan: #38BDF8;
+            --accent-emerald: #34D399;
+            --accent-indigo: #818CF8;
+            --border-color: #1E293B;
+            --font-main: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow: hidden; /* Prevent native scrolling for presentation feel */
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Presentation Frame Layout */
+        .presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar Indicator */
+        .top-navbar {
+            height: 60px;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(11, 15, 23, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+
+        .course-tag {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .project-short-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Slide Deck Workspace */
+        .slides-viewport {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.98);
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                        visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 60px 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 2;
+        }
+
+        /* Typography & Layout Patterns */
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-index {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            color: var(--accent-cyan);
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .slide-title {
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .slide-title span {
+            color: var(--accent-cyan);
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* Slide 1: Title Slide Specifics */
+        .slide-cover {
+            justify-content: center;
+            align-items: flex-start;
+            padding-left: 120px;
+            background: radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 15% 80%, rgba(52, 211, 153, 0.05) 0%, transparent 40%);
+        }
+
+        .cover-badge {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: var(--accent-cyan);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+
+        .main-title {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.25;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            max-width: 1000px;
+            letter-spacing: -0.02em;
+        }
+
+        .sub-title {
+            font-family: var(--font-main);
+            font-size: 24px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 60px;
+            max-width: 900px;
+            line-height: 1.4;
+        }
+
+        .meta-info {
+            display: flex;
+            gap: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Layout Grid System for Content Slides */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: stretch;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        /* Card Component */
+        .info-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .info-card:hover {
+            background-color: var(--bg-card-hover);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .card-icon.emerald {
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--accent-emerald);
+        }
+
+        .card-icon.indigo {
+            background: rgba(129, 140, 248, 0.1);
+            color: var(--accent-indigo);
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-subtitle {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--accent-cyan);
+            margin-top: -8px;
+        }
+
+        .card-desc {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Highlight Callout Box */
+        .highlight-box {
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.08) 0%, rgba(129, 140, 248, 0.03) 100%);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 0 16px 16px 0;
+            padding: 24px 32px;
+            margin-top: auto;
+        }
+
+        .highlight-box h4 {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .highlight-box p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Table Styling */
+        .table-container {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: var(--bg-card);
+        }
+
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .tech-table th {
+            background-color: rgba(30, 41, 59, 0.5);
+            padding: 20px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.03em;
+        }
+
+        .tech-table td {
+            padding: 22px 24px;
+            font-size: 15px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        .tech-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tech-tag {
+            font-family: var(--font-mono);
+            background-color: rgba(11, 15, 23, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-primary);
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .tech-tag.highlight {
+            color: var(--accent-emerald);
+            border-color: rgba(52, 211, 153, 0.3);
+            background-color: rgba(52, 211, 153, 0.05);
+        }
+
+        /* Flow Process Diagrams */
+        .process-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .flow-step {
+            display: flex;
+            gap: 24px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            align-items: center;
+            position: relative;
+        }
+
+        .step-num {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: rgba(56, 189, 248, 0.1);
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .flow-step.phase2 .step-num {
+            background-color: rgba(129, 140, 248, 0.1);
+            color: var(--accent-indigo);
+            border-color: rgba(129, 140, 248, 0.2);
+        }
+
+        .step-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .step-title-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .step-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 100px;
+            text-transform: uppercase;
+        }
+
+        .badge-onchain {
+            background-color: rgba(52, 211, 153, 0.1);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .badge-offchain {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge-verification {
+            background-color: rgba(129, 140, 248, 0.1);
+            color: var(--accent-indigo);
+            border: 1px solid rgba(129, 140, 248, 0.2);
+        }
+
+        .badge-execution {
+            background-color: rgba(236, 72, 153, 0.1);
+            color: #EC4899;
+            border: 1px solid rgba(236, 72, 153, 0.2);
+        }
+
+        .step-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Deliverables List View */
+        .deliverables-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            height: 100%;
+        }
+
+        .deliv-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deliv-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--accent-cyan);
+        }
+
+        .deliv-card:nth-child(2)::before { background-color: var(--accent-indigo); }
+        .deliv-card:nth-child(3)::before { background-color: var(--accent-emerald); }
+
+        .deliv-num {
+            font-family: var(--font-mono);
+            font-size: 44px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.05);
+            position: absolute;
+            top: 20px;
+            right: 28px;
+            line-height: 1;
+        }
+
+        .deliv-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .deliv-icon {
+            font-size: 24px;
+            color: var(--accent-cyan);
+        }
+        .deliv-card:nth-child(2) .deliv-icon { color: var(--accent-indigo); }
+        .deliv-card:nth-child(3) .deliv-icon { color: var(--accent-emerald); }
+
+        .deliv-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .deliv-filename {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--text-muted);
+            background: rgba(11, 15, 23, 0.4);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            display: inline-block;
+            align-self: flex-start;
+        }
+
+        .deliv-body {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Slide 8: Contact Specifics */
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
+            align-items: center;
+            height: 100%;
+        }
+
+        .contact-left h2 {
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 16px;
+        }
+
+        .contact-left p {
+            font-size: 22px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .contact-link-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 18px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .contact-link-item:hover {
+            transform: translateY(-2px);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .contact-link-item i {
+            font-size: 22px;
+            color: var(--accent-cyan);
+            width: 24px;
+            text-align: center;
+        }
+
+        .contact-link-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .contact-link-value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .contact-right {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shield-graphic {
+            font-size: 180px;
+            color: rgba(56, 189, 248, 0.06);
+            position: relative;
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .shield-graphic i:nth-child(2) {
+            position: absolute;
+            font-size: 60px;
+            color: var(--accent-cyan);
+            top: 55px;
+            left: 55px;
+        }
+
+        /* Bottom Control Panel Bar */
+        .bottom-controls {
+            height: 60px;
+            border-top: 1px solid var(--border-color);
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(11, 15, 23, 0.9);
+            z-index: 10;
+        }
+
+        .progress-indicator-container {
+            flex: 1;
+            max-width: 400px;
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 100px;
+            margin: 0 40px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 12.5%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-indigo));
+            border-radius: 100px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-counter-text {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--bg-card-hover);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: var(--border-color);
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+        
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <div class="course-tag">
+                <i class="fa-solid fa-cube rgba-icon"></i> 2026-1 블록체인실습
+            </div>
+            <div class="project-short-title">
+                Weather-Oracle Secure Vault System
+            </div>
+        </header>
+
+        <!-- Slides Viewport Workspace -->
+        <main class="slides-viewport">
+
+            <!-- SLIDE 1: COVER -->
+            <section class="slide slide-cover active" id="slide-1">
+                <div class="cover-badge">Term Project Proposal</div>
+                <h1 class="main-title">날씨 API 및 AI 에이전트(MCP) 연동을 통한<br>오라클 보안 강화형 조건부 토큰 예치(Vault) 시스템</h1>
+                <p class="sub-title">Weather API & AI Agent (MCP) Integrated Secure Oracle Vault System</p>
+                
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <span class="meta-label">Presenter</span>
+                        <span class="meta-value">전자공학부 박채원 (20221530)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Date</span>
+                        <span class="meta-value">2026. 05. 19</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 2: BACKGROUND -->
+            <section class="slide" id="slide-2">
+                <header class="slide-header">
+                    <span class="slide-index">01</span>
+                    <h2 class="slide-title">기획 배경 및 <span>문제 정의</span></h2>
+                </header>
+                <div class="slide-content grid-2">
+                    <div class="info-card">
+                        <div class="card-icon"><i class="fa-solid fa-cloud-bolt"></i></div>
+                        <h3 class="card-title">블록체인의 고립성</h3>
+                        <span class="card-subtitle">Oracle Problem</span>
+                        <p class="card-desc">블록체인 네트워크의 결정론적(Deterministic) 구조로 인한 인터넷 외부 데이터(OpenWeatherMap API 등) 직접 호출 불가 한계</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                        <h3 class="card-title">외부 데이터 조작 리스크</h3>
+                        <span class="card-subtitle">Data Feed Risk</span>
+                        <p class="card-desc">오프체인 데이터 피드 오염 및 전송 과정 해킹 리스크<br>• 악의적으로 조작된 데이터 주입 시 스마트 컨트랙트 오작동 및 대규모 자산 탈취로 직결</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <h4><i class="fa-solid fa-lightbulb"></i> 프로젝트의 출발점 (Motivation)</h4>
+                    <p>단순 토큰 전송 반복 메커니즘 탈피<br>• 직전 학기 블록체인 기본 이론(투명성/무결성)과 이번 학기 스마트 컨트랙트 상태 제어 실습 로직의 유기적 결합<br>• 실생활 환경 조건에서 안전하게 구동되는 조건부 자산 관리 서비스 흐름 구축</p>
+                </div>
+            </section>
+
+            <!-- SLIDE 3: OBJECTIVES -->
+            <section class="slide" id="slide-3">
+                <header class="slide-header">
+                    <span class="slide-index">02</span>
+                    <h2 class="slide-title">프로젝트 <span>핵심 목표</span></h2>
+                </header>
+                <div class="slide-content grid-2">
+                    <div class="info-card">
+                        <div class="card-icon emerald"><i class="fa-solid fa-robot"></i></div>
+                        <h3 class="card-title">AI 기반의 교차 검증 도입</h3>
+                        <p class="card-desc">무검증 외부 데이터 주입 방식 탈피<br>• AI 에이전트를 가교로 활용한 데이터 안정성 및 무결성 사전 필터링 검증 레이어 추가</p>
+                        <p class="card-desc" style="margin-top: -4px; border-top: 1px solid var(--border-color); padding-top: 12px; font-size: 14px;"><strong>핵심 메커니즘:</strong> 데이터 과거 패턴 분석 및 이상치 탐지 연산 수행 후, 오염 징후가 없는 정상 데이터셋만 선택적으로 온체인 반영</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon emerald"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                        <h3 class="card-title">확장된 서비스 흐름 구현</h3>
+                        <p class="card-desc">고정된 토큰 전송 흐름의 확장<br>• 실시간 기상 데이터 등 외부 동적 환경 변수 변화에 유기적으로 연동되는 조건부 파이낸셜 서비스 설계</p>
+                        <p class="card-desc" style="margin-top: -4px; border-top: 1px solid var(--border-color); padding-top: 12px; font-size: 14px;"><strong>동적 리워드 구조:</strong> 실시간 강수량, 기온 등 기상 지표 임계치가 예치 자산 보상률(Yield Rate) 산정 공식에 직접 반영되는 구조</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 4: TECH STACK -->
+            <section class="slide" id="slide-4">
+                <header class="slide-header">
+                    <span class="slide-index">03</span>
+                    <h2 class="slide-title">사용 <span>기술 스택</span></h2>
+                </header>
+                <div class="slide-content">
+                    <div class="table-container">
+                        <table class="tech-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">분류 (Layer)</th>
+                                    <th style="width: 40%;">기술 및 도구 (Tech Stack)</th>
+                                    <th style="width: 40%;">상세 역할 (Responsibility)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Blockchain</strong></td>
+                                    <td>
+                                        <span class="tech-tag">Solidity (0.8.20+)</span>
+                                        <span class="tech-tag">OpenZeppelin</span>
+                                        <span class="tech-tag">Sepolia Testnet</span>
+                                        <span class="tech-tag">MetaMask</span>
+                                        <span class="tech-tag">Hardhat</span>
+                                    </td>
+                                    <td>
+                                        • 조건부 토큰 예치 및 보상 공식 Vault 컨트랙트 로직 설계<br>
+                                        • 가이드라인에 따른 OpenZeppelin 시큐어 표준 플러그인 적용<br>
+                                        • 테스트넷 스마트 계약 배포 및 트랜잭션 가스 비용 검증<br>
+                                        • 로컬 하드햇 가상 노드 환경을 이용한 익스플로잇 시뮬레이션
+                                    </td>
+                                        </tr>
+                                <tr>
+                                    <td><strong>AI & Integration</strong></td>
+                                    <td>
+                                        <span class="tech-tag">Gemini 3.1 Pro</span>
+                                        <span class="tech-tag">Node.js</span>
+                                        <span class="tech-tag">Python</span>
+                                    </td>
+                                    <td>
+                                        • 호출된 외부 원본 데이터의 구조적 무결성 분석 및 이상치 탐지<br>
+                                        • 대형 언어 모델 지능 기반의 데이터 오염 스캐닝 및 서명 제어<br>
+                                        • 오프체인 가교 역할을 담당할 전용 <strong>MCP 서버</strong> 아키텍처 구축 및 가공
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>External Data</strong></td>
+                                    <td>
+                                        <span class="tech-tag">OpenWeatherMap API</span>
+                                    </td>
+                                    <td>
+                                        • 실시간 기상 상태 정보 지표(강수량, 기온) 실시간 동적 공급<br>
+                                        • 외부 시뮬레이션용 데이터 소스 게이트웨이 파이프라인 연동
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 5: PROCESS PHASE 1 -->
+            <section class="slide" id="slide-5">
+                <header class="slide-header">
+                    <span class="slide-index">04</span>
+                    <h2 class="slide-title">구현 절차 — <span>Phase 1</span></h2>
+                </header>
+                <div class="slide-content">
+                    <div class="process-flow">
+                        <div class="flow-step">
+                            <div class="step-num">01</div>
+                            <div class="step-body">
+                                <div class="step-title-row">
+                                    <h4 class="step-title">자산 예치 서비스 배포 단계</h4>
+                                    <span class="step-badge badge-onchain">On-chain Development</span>
+                                </div>
+                                <p class="step-text">사용자 토큰 자산(LAB/BCT) 예치(Stake) 및 회수용 코어 금고 스마트 계약 구축 및 Sepolia 테스트넷 배포</p>
+                                <p class="step-text" style="font-size: 14px; color: var(--accent-cyan);"><i class="fa-solid fa-code-branch"></i> 외부 기상 조건 변동에 따라 보상 이율 및 지급 수율이 유동적으로 변하는 WeatherSecureVault 아키텍처 구현</p>
+                            </div>
+                        </div>
+                        <div class="flow-step">
+                            <div class="step-num">02</div>
+                            <div class="step-body">
+                                <div class="step-title-row">
+                                    <h4 class="step-title">오프체인 데이터 통신 게이트웨이 구축</h4>
+                                    <span class="step-badge badge-offchain">Off-chain Integration</span>
+                                </div>
+                                <p class="step-text">안정적 데이터 수집 목적의 Node.js/Python 기반 전용 <strong>MCP 서버</strong> 인프라 구축</p>
+                                <p class="step-text" style="font-size: 14px; color: #F59E0B;"><i class="fa-solid fa-arrows-spin"></i> OpenWeatherMap API 주기적 자동 호출 및 기상 지표(기온, 강수량) 데이터 1차 전처리 가공</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 6: PROCESS PHASE 2 -->
+            <section class="slide" id="slide-6">
+                <header class="slide-header">
+                    <span class="slide-index">05</span>
+                    <h2 class="slide-title">구현 절차 — <span>Phase 2</span></h2>
+                </header>
+                <div class="slide-content">
+                    <div class="process-flow">
+                        <div class="flow-step phase2">
+                            <div class="step-num">03</div>
+                            <div class="step-body">
+                                <div class="step-title-row">
+                                    <h4 class="step-title">AI 지능형 보안 감사 및 실시간 트랙킹</h4>
+                                    <span class="step-badge badge-verification">AI Verification</span>
+                                </div>
+                                <p class="step-text">1차 정제된 오프체인 기상 데이터를 <strong>Gemini 3.1 Pro</strong> AI 레이어에 실시간 바이패스 주입</p>
+                                <p class="step-text" style="font-size: 14px; color: var(--accent-indigo);"><i class="fa-solid fa-shield-halved"></i> AI 모델의 데이터 과거 패턴 교차 검증 분석 진행<br>• 이상 징후 및 변조가 없는 무결성 확정 시 온체인 핵심 함수(<code>updateWeatherState</code>) 트랜잭션 트리거</p>
+                            </div>
+                        </div>
+                        <div class="flow-step phase2">
+                            <div class="step-num">04</div>
+                            <div class="step-body">
+                                <div class="step-title-row">
+                                    <h4 class="step-title">조건부 토큰 전송 및 상태 제어 실행</h4>
+                                    <span class="step-badge badge-execution">On-chain Execution</span>
+                                </div>
+                                <p class="step-text">검증 완료된 날씨 수치 지표(임계치 이상의 폭우/폭설 강수량 등) 기반 스마트 계약 로직 자동 자율 구동</p>
+                                <p class="step-text" style="font-size: 14px; color: #EC4899;"><i class="fa-solid fa-wallet"></i> 예치 유저 대상 추가 인센티브 리워드 토큰 계산 및 분배 발행<br>• 데이터 비상 탐지 시 출금 락업(Lock) 제한 등 실시간 자산 흐름 제어 제동</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 7: DELIVERABLES -->
+            <section class="slide" id="slide-7">
+                <header class="slide-header">
+                    <span class="slide-index">06</span>
+                    <h2 class="slide-title">예상 <span>결과물</span></h2>
+                </header>
+                <div class="slide-content deliverables-grid">
+                    <div class="deliv-card">
+                        <span class="deliv-num">01</span>
+                        <div class="deliv-header">
+                            <i class="fa-solid fa-code deliv-icon"></i>
+                            <h4 class="deliv-title">스마트 컨트랙트 코드</h4>
+                        </div>
+                        <span class="deliv-filename">WeatherVault.sol</span>
+                        <p class="deliv-body">오라클 변조 및 비정상 데이터 주입 공격 차단 목적의 시큐어 가이드라인 기반 방어 제어 로직이 내재화된 Solidity 스마트 계약 소스 코드</p>
+                    </div>
+                    <div class="deliv-card">
+                        <span class="deliv-num">02</span>
+                        <div class="deliv-header">
+                            <i class="fa-solid fa-terminal deliv-icon"></i>
+                            <h4 class="deliv-title">통신 프로세스 실행 로그</h4>
+                        </div>
+                        <span class="deliv-filename">Retained Logs</span>
+                        <p class="deliv-body">MCP 전용 서버의 API 수집부터 <strong>Gemini 3.1 Pro</strong>의 무결성 검증 및 온체인 트랜잭션 트리거까지의 전 과정 실무 터미널 실행 기록</p>
+                    </div>
+                    <div class="deliv-card">
+                        <span class="deliv-num">03</span>
+                        <div class="deliv-header">
+                            <i class="fa-solid fa-desktop deliv-icon"></i>
+                            <h4 class="deliv-title">시나리오 시뮬레이션 결과</h4>
+                        </div>
+                        <span class="deliv-filename">Screenshots</span>
+                        <p class="deliv-body">Hardhat 가상 테스트 노드 기반 이상 기상 시나리오 주입 시뮬레이션 결과 화면 및 예치 금고 보상 수율 변동 트래킹 스크린샷 자료</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 8: THANK YOU -->
+            <section class="slide" id="slide-8">
+                <div class="slide-content contact-layout">
+                    <div class="contact-left">
+                        <h2>Thank You.</h2>
+                        <p>경청해 주셔서 감사합니다.</p>
+                        
+                        <div class="contact-list">
+                            <a href="mailto:chng@kookmin.ac.kr" class="contact-link-item">
+                                <i class="fa-solid fa-envelope"></i>
+                                <div>
+                                    <span class="contact-link-label">Email Contact</span>
+                                    <span class="contact-link-value">chng@kookmin.ac.kr</span>
+                                </div>
+                            </a>
+                            <a href="https://github.com/chng-git" target="_blank" class="contact-link-item">
+                                <i class="fa-brands fa-github"></i>
+                                <div>
+                                    <span class="contact-link-label">GitHub Repository</span>
+                                    <span class="contact-link-value">github.com/chng-git</span>
+                                </div>
+                            </a>
+                            <div class="contact-link-item" style="cursor: default;">
+                                <i class="fa-solid fa-vault"></i>
+                                <div>
+                                    <span class="contact-link-label">Project Core Subject</span>
+                                    <span class="contact-link-value">WeatherSecure Vault Integration</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-right">
+                        <div class="shield-graphic">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Controller Panel Dashboard -->
+        <footer class="bottom-controls">
+            <div class="slide-counter-text">
+                Slide <span id="current-slide-num">1</span> of 8
+            </div>
+            
+            <div class="progress-indicator-container">
+                <div class="progress-bar-fill" id="slide-progress-bar"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="nav-btn" id="prev-btn" title="이전 슬라이드 (좌측 화살표)" disabled>
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button class="nav-btn" id="next-btn" title="다음 슬라이드 (우측 화살표 / 스페이스바)">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Core Presentation Logic Script Controller -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const currentSlideNumDisplay = document.getElementById('current-slide-num');
+        const progressBarFill = document.getElementById('slide-progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        
+        let currentSlideIndex = 0;
+        const totalSlides = slides.length;
+
+        function updateSlidesPresentation() {
+            // Update Active Slide Class
+            slides.forEach((slide, idx) => {
+                if(idx === currentSlideIndex) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            // Update Counter Text Display
+            currentSlideNumDisplay.textContent = currentSlideIndex + 1;
+
+            // Update Linear Navigation Progress Bar
+            const progressPercentage = ((currentSlideIndex + 1) / totalSlides) * 100;
+            progressBarFill.style.width = `${progressPercentage}%`;
+
+            // Control Button Disable Status
+            prevBtn.disabled = currentSlideIndex === 0;
+            nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+        }
+
+        function goToNextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                updateSlidesPresentation();
+            }
+        }
+
+        function goToPrevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                updateSlidesPresentation();
+            }
+        }
+
+        // Click Event Handlers
+        nextBtn.addEventListener('click', goToNextSlide);
+        prevBtn.addEventListener('click', goToPrevSlide);
+
+        // Keyboard Arrow & Hotkey Control Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                goToNextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+                e.preventDefault();
+                goToPrevSlide();
+            }
+        });
+
+        // Initialize First Render Status
+        updateSlidesPresentation();
+    </script>
+</body>
+</html>
