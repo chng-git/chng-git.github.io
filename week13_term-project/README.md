@@ -1,7 +1,8 @@
 # Week 13 Assignment
 *본 프로젝트는 2026-1 블록체인실습 기말 프로젝트로 진행되었습니다.*
 
-[🔗 발표 자료 웹으로 보기](https://chng-git.github.io/week13_term-project/)
+[🔗 Week 12 제안서 초안 웹으로 보기](https://chng-git.github.io/week12_term-project-proposal/)
+[🔗 Week 13 실제 시연 발표 자료 웹으로 보기](https://chng-git.github.io/week13_term-project/)
 
 <br>
 
