@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WeatherSecureVault 발표 자료</title>
+    <!-- FontAwesome 추가 (아이콘 렌더링을 위함) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
@@ -134,7 +137,149 @@
             margin-bottom: 10px;
         }
 
-        /* Table Style (신규 추가) */
+        /* 메타 정보 (이름, 학번 등) 스타일 이식 */
+        .meta-info {
+            display: flex;
+            gap: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 24px;
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto 0 auto;
+            justify-content: center;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: left;
+        }
+
+        .meta-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-value {
+            font-size: 1.1rem;
+            color: #f8fafc;
+            font-weight: 500;
+        }
+
+        /* 마지막 감사합니다 슬라이드 전용 레이아웃 이식 */
+        .contact-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            padding: 60px 50px !important;
+        }
+
+        .contact-left {
+            flex: 1.2;
+        }
+
+        .contact-left h2 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #60a5fa;
+            margin-bottom: 16px;
+            border: none;
+            padding-bottom: 0;
+        }
+
+        .contact-left p {
+            font-size: 1.4rem;
+            color: #94a3b8;
+            margin-bottom: 40px;
+        }
+
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .contact-link-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 18px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #f8fafc;
+            transition: all 0.2s ease;
+        }
+
+        .contact-link-item:hover {
+            transform: translateY(-2px);
+            background: rgba(15, 23, 42, 0.8);
+            border-color: #60a5fa;
+        }
+
+        .contact-link-item i {
+            font-size: 22px;
+            color: #60a5fa;
+            width: 24px;
+            text-align: center;
+        }
+
+        .contact-link-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .contact-link-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .contact-right {
+            flex: 0.8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shield-graphic {
+            font-size: 180px;
+            color: rgba(96, 165, 250, 0.06);
+            position: relative;
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        .shield-graphic i:nth-child(2) {
+            position: absolute;
+            font-size: 60px;
+            color: #60a5fa;
+            top: 55px;
+            left: 55px;
+        }
+
+        /* Table Style */
         .tech-table {
             width: 100%;
             border-collapse: collapse;
@@ -311,6 +456,7 @@
     </div>
 
     <div id="presentation">
+        <!-- 첫 번째 슬라이드 (수정됨: 이름과 학번, 날짜 추가) -->
         <div class="slide active">
             <div class="slide-content" style="text-align: center; padding: 60px 50px;">
                 <h1>AI 보조 기반 다중 오라클 검증 스마트 금고</h1>
@@ -349,9 +495,18 @@
                             Testnet</div>
                     </div>
                 </div>
-                <span class="img-caption"
-                    style="margin-top: 25px; display: block; color: #94a3b8; font-size: 0.95rem;">💡 아키텍처 흐름도: 오라클 수집 ➔
-                    AI 보안 분석 및 합의 ➔ 온체인 방어 실행</span>
+
+                <!-- 이름 및 학번 정보 메타 블록 -->
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <span class="meta-label">Presenter</span>
+                        <span class="meta-value">전자공학부 박채원 (20221530) </span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Date</span>
+                        <span class="meta-value">2026. 05. 26</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -419,8 +574,7 @@
                         </tr>
                         <tr>
                             <th>Middleware<span class="tech-sub">(오프체인 서버)</span></th>
-                            <td>Node.js, Ethers.js (서명
-                                및 블록체인 통신), Axios</td>
+                            <td>Node.js, Ethers.js (서명 및 블록체인 통신), Axios</td>
                         </tr>
                         <tr>
                             <th>Data & AI<span class="tech-sub">(오라클 및 위험도 분석)</span></th>
@@ -440,14 +594,16 @@
                         <div style="color: #fbbf24; font-weight: bold; margin-bottom: 5px; font-size: 1.15rem;">📜
                             WeatherSecureVault.sol (온체인)</div>
                         <div style="color: #e2e8f0; font-size: 1.05rem;">금고의 핵심 제어부. 외부 미들웨어에서 전달된 서명을
-                            <strong>ECDSA</strong>로 검증하고, 재전송 공격을 방어하며 조건이 충족될 때만 자산 상태를 업데이트합니다.</div>
+                            <strong>ECDSA</strong>로 검증하고, 재전송 공격을 방어하며 조건이 충족될 때만 자산 상태를 업데이트합니다.
+                        </div>
                     </div>
                     <div
                         style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #34d399; padding: 15px; border-radius: 4px;">
                         <div style="color: #34d399; font-weight: bold; margin-bottom: 5px; font-size: 1.15rem;">🤖
                             weather.js (오프체인 미들웨어)</div>
                         <div style="color: #e2e8f0; font-size: 1.05rem;">다중 API(날씨) 교차 검증 및 AI(Gemini) 위험도 분석을 수행한 후,
-                            <strong>Ethers.js</strong>를 통해 오라클 권한으로 암호학적 서명을 생성하여 컨트랙트에 전송합니다.</div>
+                            <strong>Ethers.js</strong>를 통해 오라클 권한으로 암호학적 서명을 생성하여 컨트랙트에 전송합니다.
+                        </div>
                     </div>
                     <div
                         style="background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; padding: 15px; border-radius: 4px;">
@@ -582,12 +738,52 @@
             </div>
         </div>
 
+        <div class="slide">
+            <div class="slide-content contact-layout">
+                <div class="contact-left">
+                    <h2>Thank You. </h2>
+                    <p>경청해 주셔서 감사합니다.</p>
+
+                    <div class="contact-list">
+                        <a href="mailto:chng@kookmin.ac.kr" class="contact-link-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <div>
+                                <span class="contact-link-label">Email Contact</span>
+                                <span class="contact-link-value">chng@kookmin.ac.kr</span>
+                            </div>
+                        </a>
+                        <a href="https://github.com/chng-git" target="_blank" class="contact-link-item">
+                            <i class="fa-brands fa-github"></i>
+                            <div>
+                                <span class="contact-link-label">GitHub Repository</span>
+                                <span class="contact-link-value">https://github.com/chng-git</span>
+                            </div>
+                        </a>
+                        <div class="contact-link-item" style="cursor: default;">
+                            <i class="fa-solid fa-vault"></i>
+                            <div>
+                                <span class="contact-link-label">Project Core Subject</span>
+                                <span class="contact-link-value">WeatherSecure Vault Integration</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-right">
+                    <div class="shield-graphic">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <i class="fa-solid fa-bolt-lightning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="controls">
             <button id="prevBtn" onclick="changeSlide(-1)">이전 슬라이드</button>
             <button id="nextBtn" onclick="changeSlide(1)">다음 슬라이드</button>
         </div>
 
-        <div class="slide-number" id="slideNumber">1 / 11</div>
+        <!-- 슬라이드가 11개에서 12개로 늘었으므로 JS 동적 계산에 맞춰집니다 -->
+        <div class="slide-number" id="slideNumber">1 / 12</div>
     </div>
 
     <script>
