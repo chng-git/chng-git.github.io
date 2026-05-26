@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 require("dotenv").config(); // 환경 변수 로드를 위한 안전 장치
 
 const CONTRACT_ADDRESS = "0x4cA71854cCb0423E8Aa92F1ff54097130491b933";
-const API_KEY = "93b6b8eac752d7caa1eb5fb7d668f753"; // (주의: 실무에서는 API_KEY도 .env로 숨깁니다)
+const API_KEY = process.env.OPENWEATHER_API_KEY;
 
 async function main() {
 
