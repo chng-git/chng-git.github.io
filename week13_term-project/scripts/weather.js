@@ -2,8 +2,8 @@ const axios = require("axios");
 const { ethers } = require("hardhat");
 require("dotenv").config(); // 환경 변수 로드를 위한 안전 장치
 
-const CONTRACT_ADDRESS = "0x4cA71854cCb0423E8Aa92F1ff54097130491b933";
-const API_KEY = process.env.OPENWEATHER_API_KEY;
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
+const API_KEY = process.env.WEATHER_API_KEY;
 
 async function main() {
 
@@ -47,7 +47,7 @@ async function main() {
     현재 외부 날씨는 OpenWeatherMap 기준 '${weather1}', wttr.in 기준 코드 '${weatherCode}' 입니다. 
     이 날씨에 야외에 노출된 하드웨어 금고의 잠금을 해제할 때 발생할 수 있는 환경적/물리적 리스크를 1문장으로 분석하고, 마지막에 [개방 승인] 또는 [개방 경고]를 출력하세요.`;
 
-    // 🛡️ [시스템 방어벽 추가]: 구글 AI 서버 503 에러 발생 시 런타임 종료 방지
+    // 구글 AI 서버 503 에러 발생 시 런타임 종료 방지
     try {
         const aiResult = await model.generateContent(aiPrompt);
         console.log("📊 [AI 분석 로그]:", aiResult.response.text());
@@ -77,7 +77,7 @@ async function main() {
     console.log("Sending first valid transaction...");
     const tx = await vault.updateWeatherState(finalIsRaining, timestamp, signature);
 
-    // 💡 편의성 추가: 터미널에 정상 거래 이더스캔 링크 바로 띄우기
+    // 터미널에 정상 거래 이더스캔 링크 바로 띄우기
     console.log(`🔗 정상 거래 Etherscan 링크: https://sepolia.etherscan.io/tx/${tx.hash}`);
 
     await tx.wait();
@@ -87,8 +87,7 @@ async function main() {
     // 4. 해커 리플레이 공격 시뮬레이션 및 방어 검증
     console.log("\nSimulating hacker replay attack with the EXACT SAME signature...");
     try {
-        // 💡 핵심 해결책: { gasLimit: 300000 }를 추가하여 Ethers.js의 사전 검열을 강제 우회
-        // 이렇게 해야 실패한 거래가 블록체인에 전송되어 이더스캔에 빨간 줄(Revert)이 그어집니다.
+        // { gasLimit: 300000 }를 추가하여 Ethers.js의 사전 검열을 강제 우회
         const tx2 = await vault.updateWeatherState(finalIsRaining, timestamp, signature, { gasLimit: 300000 });
 
         console.log(`🔗 해커 차단 Etherscan 링크: https://sepolia.etherscan.io/tx/${tx2.hash}`);
