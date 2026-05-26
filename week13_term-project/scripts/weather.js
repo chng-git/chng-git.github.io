@@ -58,6 +58,7 @@ async function main() {
 
     console.log("=====================================================================\n");
 
+
     // 3. 암호학적 서명 생성 및 온체인 전송 (Security)
     const [serverWallet] = await ethers.getSigners();
 
@@ -75,16 +76,24 @@ async function main() {
     // 정상 트랜잭션 전송
     console.log("Sending first valid transaction...");
     const tx = await vault.updateWeatherState(finalIsRaining, timestamp, signature);
-    await tx.wait();
 
+    // 💡 편의성 추가: 터미널에 정상 거래 이더스캔 링크 바로 띄우기
+    console.log(`🔗 정상 거래 Etherscan 링크: https://sepolia.etherscan.io/tx/${tx.hash}`);
+
+    await tx.wait();
     console.log("Weather state updated securely!");
 
 
     // 4. 해커 리플레이 공격 시뮬레이션 및 방어 검증
     console.log("\nSimulating hacker replay attack with the EXACT SAME signature...");
     try {
-        const tx2 = await vault.updateWeatherState(finalIsRaining, timestamp, signature);
+        // 💡 핵심 해결책: { gasLimit: 300000 }를 추가하여 Ethers.js의 사전 검열을 강제 우회
+        // 이렇게 해야 실패한 거래가 블록체인에 전송되어 이더스캔에 빨간 줄(Revert)이 그어집니다.
+        const tx2 = await vault.updateWeatherState(finalIsRaining, timestamp, signature, { gasLimit: 300000 });
+
+        console.log(`🔗 해커 차단 Etherscan 링크: https://sepolia.etherscan.io/tx/${tx2.hash}`);
         await tx2.wait();
+
         console.log("🚨 [Error] 방어 실패: 중복 트랜잭션이 허용되었습니다.");
     } catch (error) {
         console.log("🛡️ [Success] 방어 성공: 트랜잭션이 차단되었습니다.");
