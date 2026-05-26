@@ -660,7 +660,7 @@
                     </li>
                 </ul>
                 <div class="img-container">
-                    <img src="images/img01.png" alt="타임스탬프 에러 로그" onerror="this.style.display='none'">
+                    <img src="images/img01.png" alt="타임스탬프 에러 로그" onclick="openModal(this.src)" style="cursor: zoom-in;" onerror="this.style.display='none'">
                     <span class="img-caption">💡 [이미지] 해결 전 튕겨 나갔던 에러 로그 화면</span>
                 </div>
             </div>
@@ -685,12 +685,12 @@
                     <div style="display: flex; gap: 10px;">
                         <div class="img-container"
                             style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                            <img src="images/img02.png" alt="터미널 차단 로그" onerror="this.style.display='none'">
+                            <img src="images/img02.png" alt="터미널 차단 로그" onclick="openModal(this.src)" style="cursor: zoom-in;" onerror="this.style.display='none'">
                             <span class="img-caption">💡 [이미지] 터미널 해커 차단 성공 로그</span>
                         </div>
                     <div class="img-container" style="flex: 1;">
-                        <img src="images/img03.png" alt="이더스캔 성공 기록" onerror="this.style.display='none'">
-                        <span class="img-caption">💡 [이미지] Etherscan 성공/Revert 기록</span>
+                        <img src="images/img03.png" alt="이더스캔 성공 기록" onclick="openModal(this.src)" style="cursor: zoom-in;" onerror="this.style.display='none'">
+                        <span class="img-caption">💡 [이미지] Etherscan 성공 기록</span>
                     </div>
                 </div>
             </div>
@@ -709,7 +709,7 @@
                     </li>
                 </ul>
                 <div class="img-container">
-                    <img src="images/img04.png" alt="AI 위험도 분석 로그" onerror="this.style.display='none'">
+                    <img src="images/img04.png" alt="AI 위험도 분석 로그" onclick="openModal(this.src)" style="cursor: zoom-in;" onerror="this.style.display='none'">
                     <span class="img-caption">💡 [이미지] AI의 개방 경고 로그 캡처</span>
                 </div>
             </div>
@@ -823,7 +823,23 @@
         });
 
         updateUI();
+
+        function openModal(src) {
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImg');
+                modal.style.display = 'flex';
+                modalImg.src = src;
+            }
+
+            function closeModal() {
+                document.getElementById('imageModal').style.display = 'none';
+            }
     </script>
+    <div id="imageModal" onclick="closeModal()"
+        style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(11, 16, 33, 0.9); backdrop-filter:blur(5px); justify-content:center; align-items:center; cursor:zoom-out;">
+        <img id="modalImg"
+            style="max-width:90%; max-height:85vh; border-radius:12px; box-shadow:0 0 30px rgba(59, 130, 246, 0.3); border:1px solid rgba(255,255,255,0.1);">
+    </div>
 </body>
 
 </html>
