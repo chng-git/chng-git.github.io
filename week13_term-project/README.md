@@ -23,7 +23,7 @@
 
 <br>
 
-## 📁 Directory Structure (폴더 구조)
+## 폴더 구조
 
 ```text
 📦 WeatherSecureVault
