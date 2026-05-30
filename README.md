@@ -18,6 +18,7 @@ This table is automatically updated via GitHub Actions.
 
 | 주차 | 과제명 | 소스 코드 (Repository) | 실제 실행 (Live Demo) |
 |:---:|:---|:---:|:---:|
+| **Week 14** | Upbit Mcp Dashboard | [📁 소스 보기](./week14_upbit-mcp-dashboard) | (UI 없음) |
 | **Week 13** | Term Project | [📁 소스 보기](./week13_term-project) | [🚀 웹에서 실행하기](https://chng-git.github.io/week13_term-project) |
 | **Week 12** | Term Project Proposal | [📁 소스 보기](./week12_term-project-proposal) | [🚀 웹에서 실행하기](https://chng-git.github.io/week12_term-project-proposal) |
 | **Week 11** | Smart Contract Hacks | [📁 소스 보기](./week11_smart-contract-hacks) | (UI 없음) |
